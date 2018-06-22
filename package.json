@@ -1,0 +1,28 @@
+{
+  "name": "crawler-web-pages",
+  "version": "1.0.0",
+  "description": "Crawler (spider) of site web pages by domain name",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/safonovpro/node-crawler-web-pages.git"
+  },
+  "keywords": [
+    "node",
+    "nodejs",
+    "crawler",
+    "crawling",
+    "spider",
+    "scraper",
+    "scraping"
+  ],
+  "author": "Alexey V Safonov",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/safonovpro/node-crawler-web-pages/issues"
+  },
+  "homepage": "https://github.com/safonovpro/node-crawler-web-pages#readme"
+}
