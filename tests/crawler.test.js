@@ -27,4 +27,27 @@ describe('Class Crawler', () => {
                 });
         });
     });
+
+    describe('Method _isInternalUrlAndNotOnlyHash', () => {
+        const urls = {
+            'http://example.com' : true,
+            'https://www.example.com/some/path' : true,
+            '//www.example.com/some/path' : true,
+            '/some/path': true,
+            'some/path': true,
+            'http://safonov.pro' : false,
+            'https://www.safonov.pro/some/path' : false,
+            '//www.safonov.pro/some/path' : false,
+            'mailto:alexey@safonov.pro': false,
+            'tg://resolve?domain=safonovpro': false,
+            'viber://chat?number=+79213126942': false,
+            '#garget': false
+        };
+
+        for(let url in urls) {
+            it(`${url} an internal and not only hash?`, () => {
+                assert(crawler._isInternalUrlAndNotOnlyHash(url) === urls[url]);
+            });
+        }
+    });
 });

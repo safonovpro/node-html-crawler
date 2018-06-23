@@ -13,6 +13,27 @@ class Crawler extends EventEmitter {
         this.config.domain = (this.config.domain === undefined) ? 'example.com' : this.config.domain.trim();
     }
 
+    _isInternalUrlAndNotOnlyHash(urlString) {
+        let urlObject = url.parse(urlString);
+        let result = false;
+
+        if(urlObject.hostname) {
+            if(urlObject.hostname.replace(/^w{3}\./, '') === this.config.domain.replace(/^w{3}\./, '')) {
+                result = true;
+            }
+        } else if(/^\/\//.test(urlObject.pathname)) {
+           urlObject = url.parse('protocol:' + urlString);
+
+            if(urlObject.hostname.replace(/^w{3}\./, '') === this.config.domain.replace(/^w{3}\./, '')) {
+                result = true;
+            }
+        } else if(urlObject.path) {
+            result = true;
+        }
+
+        return result;
+    }
+
     _getDataByUrl(urlString, method = 'GET') {
         const urlObject = url.parse(urlString);
         const reqModule = (urlObject.protocol === 'https:') ? https : http;
