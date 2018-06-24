@@ -10,6 +10,7 @@
     "http://safonov.pro" : false,
     "https://www.safonov.pro/some/path" : false,
     "//www.safonov.pro/some/path" : false,
+    "mailto:example@example.com": false,
     "mailto:alexey@safonov.pro": false,
     "tg://resolve?domain=safonovpro": false,
     "viber://chat?number=+79213126942": false,

@@ -10,11 +10,13 @@ describe('Class Crawler', () => {
             const url = `${protocol}://example.com/`;
 
             it(`Method GET, URL is ${url}`, () => {
-                return crawler._getDataByUrl(url)
+                return crawler._getDataByUrl(url, 'GET')
                     .then(result => {
+                        assert(typeof result.requestMethod === 'string' && result.requestMethod === 'GET');
                         assert(typeof result.statusCode === 'number' && result.statusCode === 200);
                         assert(typeof result.headers === 'object' && result.headers['content-type'] === 'text/html');
                         assert(typeof result.body === 'string' && result.body.length > 0);
+                        assert(typeof result.links === 'object' && result.links.length === 1 && result.links[0] === 'http://www.iana.org/domains/example');
                     });
             });
         }
@@ -22,6 +24,7 @@ describe('Class Crawler', () => {
         it(`Method HEAD, URL is http://yandex.ru/`, () => {
             return crawler._getDataByUrl('http://yandex.ru/')
                 .then(result => {
+                    assert(typeof result.requestMethod === 'string' && result.requestMethod === 'HEAD');
                     assert(typeof result.statusCode === 'number' && /30\d/.test(result.statusCode));
                     assert(typeof result.headers === 'object' && result.headers['location'] === 'https://yandex.ru/');
                     assert(typeof result.body === 'string' && result.body.length === 0);

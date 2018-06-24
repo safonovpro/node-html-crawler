@@ -2,6 +2,7 @@ const EventEmitter = require('events');
 const http = require('http');
 const https = require('https');
 const url = require('url');
+const cheerio = require('cheerio');
 
 class Crawler extends EventEmitter {
     constructor(config) {
@@ -10,7 +11,56 @@ class Crawler extends EventEmitter {
         this.config = config || {};
 
         // Default values
+        this.config.protocol = (this.config.protocol === undefined) ? 'http:' : this.config.protocol.trim();
         this.config.domain = (this.config.domain === undefined) ? 'example.com' : this.config.domain.trim();
+        this.config.limitForConnections = (this.config.limitForConnections === undefined) ? 10 : parseInt(this.config.limitForConnections);
+        this.config.limitForRedirects = (this.config.limitForRedirects === undefined) ? 3 : parseInt(this.config.limitForRedirects);
+        this.config.timeout = (this.config.timeout === undefined) ? 100 : parseInt(this.config.timeout);
+
+        this.countOfConnections = 0;
+        this.startUrl = `${this.config.protocol}//${this.config.domain}/`;
+        this.foundLinks = new Set();
+    }
+
+    crawl(urlString = this.startUrl, countOfRedirects = 0) {
+        if(!this.foundLinks.has(urlString) && countOfRedirects < this.config.limitForRedirects) {
+            const currentUrl = urlString;
+
+            if(this.countOfConnections < this.config.limitForConnections) {
+                this.foundLinks.add(currentUrl);
+
+                this._getDataByUrl(currentUrl)
+                    .then(result => {
+                        if(result.statusCode === 200 && /^text\/html/.test(result.headers['content-type'])) {
+                            this._getDataByUrl(currentUrl, 'GET')
+                                .then(result => {
+                                    console.log(result.statusCode, currentUrl); // Место для события data
+
+                                    const $ = cheerio.load(result.body);
+                                    const base = ($('base[href]').length > 0) ? $('base').attr('href').replace(/\/+$/, '') + '/' : undefined;
+
+                                    for(let link of result.links) {
+                                        const nextUrl = this._getInternalFullUrlWithoutAuthAndHash(link, currentUrl, base);
+
+                                        if(nextUrl) this.crawl(nextUrl);
+                                    }
+                                }).catch(error => console.error(`Error in ${currentUrl}: ${error}`));
+                        } else if(/30\d/.test(result.statusCode)) {
+                            console.log(result.statusCode, currentUrl); // Место для события data
+
+                            const nextUrl = this._getInternalFullUrlWithoutAuthAndHash(result.headers['location'], currentUrl);
+
+                            if(nextUrl) this.crawl(nextUrl, ++countOfRedirects);
+                        } else {
+                            console.log(result.statusCode, currentUrl); // Место для события data
+                        }
+                    }).catch(error => console.error(`Error in ${currentUrl}: ${error}`));
+            } else {
+                setTimeout(() => {
+                    this.crawl(currentUrl, countOfRedirects);
+                }, this.config.timeout);
+            }
+        }
     }
 
     _getInternalFullUrlWithoutAuthAndHash(urlString, parentUrl, parentTagBaseHrefValue) {
@@ -60,7 +110,7 @@ class Crawler extends EventEmitter {
         return result;
     }
 
-    _getDataByUrl(urlString, method = 'GET') {
+    _getDataByUrl(urlString, method = 'HEAD') {
         const urlObject = url.parse(urlString);
         const reqModule = (urlObject.protocol === 'https:') ? https : http;
         const options = {
@@ -71,22 +121,45 @@ class Crawler extends EventEmitter {
             headers: { 'User-Agent': 'Mozilla/5.0' }
         };
 
+        this.countOfConnections++;
+
         return new Promise((resolve, reject) => {
             let request = reqModule.request(options, (response) => {
                 let body = '';
 
                 response.setEncoding('utf8');
                 response.on('data', chunk => body += chunk);
-                response.on('end', () => resolve({
-                    statusCode: response.statusCode,
-                    headers: response.headers,
-                    body: body
-                }));
+                response.on('end', () => {
+                    this.countOfConnections--;
+
+                    resolve({
+                        requestMethod: method,
+                        statusCode: response.statusCode,
+                        headers: response.headers,
+                        body: body,
+                        links: (response.statusCode === 200 && /^text\/html/.test(response.headers['content-type'])) ? this._getUrlsOnHtml(body) : []
+                    });
+                });
             });
 
             request.on('error', error => reject(error));
             request.end();
         });
+    }
+
+    _getUrlsOnHtml(html) {
+        const $ = cheerio.load(html);
+        const result = [];
+
+        $('a').each((index, element) => {
+            const href = $(element).attr('href');
+
+            if(result.find((value) => (value === href)) === undefined) {
+                result.push(href);
+            }
+        });
+
+        return result;
     }
 }
 

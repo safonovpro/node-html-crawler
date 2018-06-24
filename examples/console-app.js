@@ -1,10 +1,8 @@
 const Crawler = require('./../classes/crawler');
 
-const crawler = new Crawler();
+const crawler = new Crawler({
+    protocol: 'http:',
+    domain: 'safonov.pro'
+});
 
-// crawler._getDataByUrl('http://example.com/', 'HEAD')
-//     .then(response => {
-//         console.log(typeof response.statusCode, typeof response.headers, response.body);
-//     });
-
-console.log(crawler._getFullUrl('//eltech.ru/some/path/'));
+crawler.crawl();
