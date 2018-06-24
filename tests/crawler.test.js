@@ -33,9 +33,11 @@ describe('Class Crawler', () => {
         const conditions = config['_isInternalUrlAndNotOnlyHash'];
 
         for(let url in conditions) {
-            it(`${url} an internal and not only hash?`, () => {
-                assert(crawler._isInternalUrlAndNotOnlyHash(url) === conditions[url]);
-            });
+            if(conditions.hasOwnProperty(url)) {
+                it(`${url} an internal and not only hash?`, () => {
+                    assert(crawler._isInternalUrlAndNotOnlyHash(url) === conditions[url]);
+                });
+            }
         }
     });
 
