@@ -13,6 +13,32 @@ class Crawler extends EventEmitter {
         this.config.domain = (this.config.domain === undefined) ? 'example.com' : this.config.domain.trim();
     }
 
+    _getInternalFullUrlWithoutAuthAndHash(urlString, parentUrl, parentTagBaseHrefValue) {
+        let result = false;
+
+        if(this._isInternalUrlAndNotOnlyHash(urlString)) {
+            const urlObject = url.parse(urlString);
+
+            if(urlObject.protocol && urlObject.hostname) {
+               result = urlObject.protocol + '//' + urlObject.host + urlObject.path;
+            } else if(parentUrl !== undefined) {
+                const parentUrlObject = url.parse(parentUrl);
+
+                if(!urlObject.protocol && /^\/\//.test(urlObject.pathname)) {
+                    result = parentUrlObject.protocol + urlObject.path;
+                } else if(parentTagBaseHrefValue !== undefined) {
+                    result = parentTagBaseHrefValue.replace(/\/$/, '') + '/' + urlObject.path.replace(/^\//, '');
+                } else if(/^\//.test(urlObject.pathname)) {
+                    result = parentUrlObject.protocol + '//' + parentUrlObject.host + urlObject.path;
+                } else {
+                    result = parentUrlObject.protocol + '//' + parentUrlObject.host + parentUrlObject.path.replace(/[^\/]*$/,'') + urlObject.path;
+                }
+            }
+        }
+
+        return result;
+    }
+
     _isInternalUrlAndNotOnlyHash(urlString) {
         let urlObject = url.parse(urlString);
         let result = false;
