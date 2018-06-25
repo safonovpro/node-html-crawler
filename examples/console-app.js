@@ -3,7 +3,7 @@ const Crawler = require('./../classes/crawler');
 
 const config = commandLineArgs([
     {name: 'protocol', alias: 'p', defaultValue: 'http:'},
-    {name: 'domain', alias: 'd', defaultValue: 'example.com'},
+    {name: 'domain', alias: 'd', defaultValue: 'safonov.pro'},
     {name: 'connections', alias: 'c'},
     {name: 'redirects', alias: 'r'},
     {name: 'timeout', alias: 't'}
