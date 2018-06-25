@@ -170,11 +170,11 @@ class Crawler extends EventEmitter {
     _generateEvents(eventsType, data) {
         if(eventsType === 'data') {
             this.countOfProcessedUrls++;
-            console.log(`${this.countOfProcessedUrls} из ${this.foundLinks.size}`, data.result.statusCode, data.currentUrl); // Место для события data
+            this.emit('data', {url: data.currentUrl, result: data.result});
 
-            if(this.countOfProcessedUrls === this.foundLinks.size) console.log('end'); // Место для события end
+            if(this.countOfProcessedUrls === this.foundLinks.size) this.emit('end');
         } else if(eventsType === 'error') {
-            console.error(`Error in ${data.currentUrl}: ${data.error}`); // Место для события error
+            this.emit('error', new Error(`Error in ${data.currentUrl}: ${data.error}`));
         }
     }
 }
