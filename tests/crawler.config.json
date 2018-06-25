@@ -9,9 +9,12 @@
     "some/path": true,
     "http://safonov.pro" : false,
     "https://www.safonov.pro/some/path" : false,
+    "https://username:password@www.safonov.pro/some/path" : false,
     "//www.safonov.pro/some/path" : false,
+    "//username:password@www.safonov.pro/some/path" : false,
     "mailto:example@example.com": false,
     "mailto:alexey@safonov.pro": false,
+    "javascript:void(0)": false,
     "tg://resolve?domain=safonovpro": false,
     "viber://chat?number=+79213126942": false,
     "#garget": false
