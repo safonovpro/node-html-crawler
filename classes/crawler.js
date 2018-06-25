@@ -20,6 +20,7 @@ class Crawler extends EventEmitter {
         this.countOfConnections = 0;
         this.startUrl = `${this.config.protocol}//${this.config.domain}/`;
         this.foundLinks = new Set();
+        this.countOfProcessedUrls = 0;
     }
 
     crawl(urlString = this.startUrl, countOfRedirects = 0) {
@@ -34,8 +35,6 @@ class Crawler extends EventEmitter {
                         if(result.statusCode === 200 && /^text\/html/.test(result.headers['content-type'])) {
                             this._getDataByUrl(currentUrl, 'GET')
                                 .then(result => {
-                                    console.log(result.statusCode, currentUrl); // Место для события data
-
                                     const $ = cheerio.load(result.body);
                                     const base = ($('base[href]').length > 0) ? $('base').attr('href').replace(/\/+$/, '') + '/' : undefined;
 
@@ -44,17 +43,23 @@ class Crawler extends EventEmitter {
 
                                         if(nextUrl) this.crawl(nextUrl);
                                     }
-                                }).catch(error => console.error(`Error in ${currentUrl}: ${error}`));
-                        } else if(/30\d/.test(result.statusCode)) {
-                            console.log(result.statusCode, currentUrl); // Место для события data
 
+                                    this._generateEvents('data', {currentUrl, result});
+                                }).catch(error => {
+                                    this._generateEvents('error', {currentUrl, error});
+                                });
+                        } else if(/30\d/.test(result.statusCode)) {
                             const nextUrl = this._getInterestingFullUrlWithoutAuthAndHash(result.headers['location'], currentUrl);
 
                             if(nextUrl) this.crawl(nextUrl, ++countOfRedirects);
+
+                            this._generateEvents('data', {currentUrl, result});
                         } else {
-                            console.log(result.statusCode, currentUrl); // Место для события data
+                            this._generateEvents('data', {currentUrl, result});
                         }
-                    }).catch(error => console.error(`Error in ${currentUrl}: ${error}`));
+                    }).catch(error => {
+                        this._generateEvents('error', {currentUrl, error});
+                    });
             } else {
                 setTimeout(() => {
                     this.crawl(currentUrl, countOfRedirects);
@@ -138,7 +143,11 @@ class Crawler extends EventEmitter {
                 });
             });
 
-            request.on('error', error => reject(error));
+            request.on('error', error => {
+                this.countOfConnections--;
+
+                reject(error)
+            });
             request.end();
         });
     }
@@ -156,6 +165,17 @@ class Crawler extends EventEmitter {
         });
 
         return result;
+    }
+
+    _generateEvents(eventsType, data) {
+        if(eventsType === 'data') {
+            this.countOfProcessedUrls++;
+            console.log(`${this.countOfProcessedUrls} из ${this.foundLinks.size}`, data.result.statusCode, data.currentUrl); // Место для события data
+
+            if(this.countOfProcessedUrls === this.foundLinks.size) console.log('end'); // Место для события end
+        } else if(eventsType === 'error') {
+            console.error(`Error in ${data.currentUrl}: ${data.error}`); // Место для события error
+        }
     }
 }
 
