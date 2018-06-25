@@ -150,7 +150,7 @@ class Crawler extends EventEmitter {
         $('a').each((index, element) => {
             const href = $(element).attr('href');
 
-            if(result.find((value) => (value === href)) === undefined) {
+            if(href !== undefined && result.find((value) => (value === href)) === undefined) {
                 result.push(href);
             }
         });
