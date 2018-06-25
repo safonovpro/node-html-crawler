@@ -1,5 +1,5 @@
 {
-  "_isInternalUrlAndNotOnlyHash" : {
+  "_isInterestingUrl" : {
     "http://example.com" : true,
     "https://www.example.com/some/path" : true,
     "https://username:password@example.com/some/path" : true,
@@ -19,7 +19,7 @@
     "viber://chat?number=+79213126942": false,
     "#garget": false
   },
-  "_getInternalFullUrlWithoutAuthAndHash" : [
+  "_getInterestingFullUrlWithoutAuthAndHash" : [
     {"in": {"urlString": "http://example.com/some/path?a=1&b=2#hash"}, "out": "http://example.com/some/path?a=1&b=2"},
     {"in": {"urlString": "http://username:password@example.com/some/path?a=1&b=2#hash"}, "out": "http://example.com/some/path?a=1&b=2"},
     {"in": {"urlString": "//example.com/some/path?a=1&b=2#hash", "parentUrl": "http://example.com/page.html"}, "out": "http://example.com/some/path?a=1&b=2"},

@@ -40,7 +40,7 @@ class Crawler extends EventEmitter {
                                     const base = ($('base[href]').length > 0) ? $('base').attr('href').replace(/\/+$/, '') + '/' : undefined;
 
                                     for(let link of result.links) {
-                                        const nextUrl = this._getInternalFullUrlWithoutAuthAndHash(link, currentUrl, base);
+                                        const nextUrl = this._getInterestingFullUrlWithoutAuthAndHash(link, currentUrl, base);
 
                                         if(nextUrl) this.crawl(nextUrl);
                                     }
@@ -48,7 +48,7 @@ class Crawler extends EventEmitter {
                         } else if(/30\d/.test(result.statusCode)) {
                             console.log(result.statusCode, currentUrl); // Место для события data
 
-                            const nextUrl = this._getInternalFullUrlWithoutAuthAndHash(result.headers['location'], currentUrl);
+                            const nextUrl = this._getInterestingFullUrlWithoutAuthAndHash(result.headers['location'], currentUrl);
 
                             if(nextUrl) this.crawl(nextUrl, ++countOfRedirects);
                         } else {
@@ -63,10 +63,10 @@ class Crawler extends EventEmitter {
         }
     }
 
-    _getInternalFullUrlWithoutAuthAndHash(urlString, parentUrl, parentTagBaseHrefValue) {
+    _getInterestingFullUrlWithoutAuthAndHash(urlString, parentUrl, parentTagBaseHrefValue) {
         let result = false;
 
-        if(this._isInternalUrlAndNotOnlyHash(urlString)) {
+        if(this._isInterestingUrl(urlString)) {
             const urlObject = url.parse(urlString);
 
             if(urlObject.protocol && urlObject.hostname) {
@@ -89,21 +89,17 @@ class Crawler extends EventEmitter {
         return result;
     }
 
-    _isInternalUrlAndNotOnlyHash(urlString) {
-        let urlObject = url.parse(urlString);
+    _isInterestingUrl(urlString) {
+        let urlObject = url.parse((/^\/\//.test(urlString.trim()) ? `http:${urlString}` : urlString));
         let result = false;
 
-        if(urlObject.hostname) {
-            if(urlObject.hostname.replace(/^w{3}\./, '') === this.config.domain.replace(/^w{3}\./, '')) {
-                result = true;
+        if(/^https?:/.test(urlObject.protocol)) {
+            if(urlObject.hostname) {
+                if(urlObject.hostname.replace(/^w{3}\./, '') === this.config.domain.replace(/^w{3}\./, '')) {
+                    result = true;
+                }
             }
-        } else if(/^\/\//.test(urlObject.pathname)) {
-           urlObject = url.parse('protocol:' + urlString);
-
-            if(urlObject.hostname.replace(/^w{3}\./, '') === this.config.domain.replace(/^w{3}\./, '')) {
-                result = true;
-            }
-        } else if(urlObject.path) {
+        } else if(!urlObject.protocol && !urlObject.host && urlObject.path) {
             result = true;
         }
 

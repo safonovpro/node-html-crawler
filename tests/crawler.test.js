@@ -32,24 +32,24 @@ describe('Class Crawler', () => {
         });
     });
 
-    describe('Method _isInternalUrlAndNotOnlyHash', () => {
-        const conditions = config['_isInternalUrlAndNotOnlyHash'];
+    describe('Method _isInterestingUrl', () => {
+        const conditions = config['_isInterestingUrl'];
 
         for(let url in conditions) {
             if(conditions.hasOwnProperty(url)) {
                 it(`${url} an internal and not only hash?`, () => {
-                    assert(crawler._isInternalUrlAndNotOnlyHash(url) === conditions[url]);
+                    assert(crawler._isInterestingUrl(url) === conditions[url]);
                 });
             }
         }
     });
 
-    describe('Method _getInternalFullUrlWithoutAuthAndHash', () => {
-        const conditions = config['_getInternalFullUrlWithoutAuthAndHash'];
+    describe('Method _getInterestingFullUrlWithoutAuthAndHash', () => {
+        const conditions = config['_getInterestingFullUrlWithoutAuthAndHash'];
 
         for(let condition of conditions) {
             it(`Full url from ${condition.in.urlString}`, () => {
-                assert(crawler._getInternalFullUrlWithoutAuthAndHash(condition.in.urlString, condition.in.parentUrl, condition.in.parentTagBaseHrefValue) === condition.out);
+                assert(crawler._getInterestingFullUrlWithoutAuthAndHash(condition.in.urlString, condition.in.parentUrl, condition.in.parentTagBaseHrefValue) === condition.out);
             });
         }
     });
