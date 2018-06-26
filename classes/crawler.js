@@ -69,25 +69,24 @@ class Crawler extends EventEmitter {
     }
 
     _getInterestingFullUrlWithoutAuthAndHash(urlString, parentUrl, parentTagBaseHrefValue) {
+        const urlObject = url.parse(urlString);
         let result = false;
 
-        if(this._isInterestingUrl(urlString)) {
-            const urlObject = url.parse(urlString);
+        if(!this._isInterestingUrl(urlString)) return result;
 
-            if(urlObject.protocol && urlObject.hostname) {
-               result = urlObject.protocol + '//' + urlObject.host + urlObject.path;
-            } else if(parentUrl !== undefined) {
-                const parentUrlObject = url.parse(parentUrl);
+        if(urlObject.protocol && urlObject.hostname) {
+           result = urlObject.protocol + '//' + urlObject.host + urlObject.path;
+        } else if(parentUrl !== undefined) {
+            const parentUrlObject = url.parse(parentUrl);
 
-                if(!urlObject.protocol && /^\/\//.test(urlObject.pathname)) {
-                    result = parentUrlObject.protocol + urlObject.path;
-                } else if(parentTagBaseHrefValue !== undefined) {
-                    result = parentTagBaseHrefValue.replace(/\/$/, '') + '/' + urlObject.path.replace(/^\//, '');
-                } else if(/^\//.test(urlObject.pathname)) {
-                    result = parentUrlObject.protocol + '//' + parentUrlObject.host + urlObject.path;
-                } else {
-                    result = parentUrlObject.protocol + '//' + parentUrlObject.host + parentUrlObject.path.replace(/[^\/]*$/,'') + urlObject.path;
-                }
+            if(!urlObject.protocol && /^\/\//.test(urlObject.pathname)) {
+                result = parentUrlObject.protocol + urlObject.path;
+            } else if(parentTagBaseHrefValue !== undefined) {
+                result = parentTagBaseHrefValue.replace(/\/$/, '') + '/' + urlObject.path.replace(/^\//, '');
+            } else if(/^\//.test(urlObject.pathname)) {
+                result = parentUrlObject.protocol + '//' + parentUrlObject.host + urlObject.path;
+            } else {
+                result = parentUrlObject.protocol + '//' + parentUrlObject.host + parentUrlObject.path.replace(/[^\/]*$/,'') + urlObject.path;
             }
         }
 
