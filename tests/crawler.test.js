@@ -1,3 +1,4 @@
+const fs =      require('fs');
 const assert =  require('chai').assert;
 const config =  require('./crawler.config');
 const Crawler = require('../classes/crawler');
@@ -52,5 +53,17 @@ describe('Class Crawler', () => {
                 assert(crawler._getInterestingFullUrlWithoutAuthAndHash(condition.in.urlString, condition.in.parentUrl, condition.in.parentTagBaseHrefValue) === condition.out);
             });
         }
+    });
+
+    describe('Method _getUrlsOnHtml', () => {
+        const html = fs.readFileSync(`${__dirname}/src/page-with-links.html`, 'utf-8');
+        const links = crawler._getUrlsOnHtml(html);
+
+        it(`Links from page ${__dirname}/src/page-with-links.html`, () => {
+            assert(links.length === 3);
+            assert(links[0] === 'https://github.com/safonovpro/node-crawler-web-pages');
+            assert(links[1] === 'https://github.com/safonovpro');
+            assert(links[2] === 'https://safonov.pro/');
+        });
     });
 });
