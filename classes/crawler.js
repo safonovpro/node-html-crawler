@@ -35,13 +35,8 @@ class Crawler extends EventEmitter {
                         if(result.statusCode === 200 && /^text\/html/.test(result.headers['content-type'])) {
                             this._getDataByUrl(currentUrl, 'GET')
                                 .then(result => {
-                                    const $ = cheerio.load(result.body);
-                                    const base = ($('base[href]').length > 0) ? $('base').attr('href').replace(/\/+$/, '') + '/' : undefined;
-
                                     for(let link of result.links) {
-                                        const nextUrl = this._getInterestingFullUrlWithoutAuthAndHash(link, currentUrl, base);
-
-                                        if(nextUrl) this.crawl(nextUrl);
+                                        if(link.url) this.crawl(link.url);
                                     }
 
                                     this._generateEvents('data', {currentUrl, result});
@@ -137,7 +132,7 @@ class Crawler extends EventEmitter {
                         statusCode: response.statusCode,
                         headers: response.headers,
                         body: body,
-                        links: (response.statusCode === 200 && /^text\/html/.test(response.headers['content-type'])) ? this._getUrlsOnHtml(body) : []
+                        links: (response.statusCode === 200 && /^text\/html/.test(response.headers['content-type'])) ? this._getUrlsOnHtml(urlString, body) : []
                     });
                 });
             });
@@ -151,15 +146,19 @@ class Crawler extends EventEmitter {
         });
     }
 
-    _getUrlsOnHtml(html) {
+    _getUrlsOnHtml(currentUrl, html) {
         const $ = cheerio.load(html);
+        const base = ($('base[href]').length > 0) ? $('base').attr('href').replace(/\/+$/, '') + '/' : undefined;
         const result = [];
 
         $('a').each((index, element) => {
             const href = $(element).attr('href');
 
             if(href !== undefined && result.find((value) => (value === href)) === undefined) {
-                result.push(href);
+                result.push({
+                    href: href,
+                    url: this._getInterestingFullUrlWithoutAuthAndHash(href, currentUrl, base)
+                });
             }
         });
 

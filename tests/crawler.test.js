@@ -17,7 +17,7 @@ describe('Class Crawler', () => {
                         assert(typeof result.statusCode === 'number' && result.statusCode === 200);
                         assert(typeof result.headers === 'object' && result.headers['content-type'] === 'text/html');
                         assert(typeof result.body === 'string' && result.body.length > 0);
-                        assert(typeof result.links === 'object' && result.links.length === 1 && result.links[0] === 'http://www.iana.org/domains/example');
+                        assert(typeof result.links === 'object' && result.links.length === 1 && result.links[0].href === 'http://www.iana.org/domains/example');
                     });
             });
         }
@@ -57,13 +57,13 @@ describe('Class Crawler', () => {
 
     describe('Method _getUrlsOnHtml', () => {
         const html = fs.readFileSync(`${__dirname}/src/page-with-links.html`, 'utf-8');
-        const links = crawler._getUrlsOnHtml(html);
+        const links = crawler._getUrlsOnHtml('http://example.com/some/path', html);
 
         it(`Links from page ${__dirname}/src/page-with-links.html`, () => {
             assert(links.length === 3);
-            assert(links[0] === 'https://github.com/safonovpro/node-crawler-web-pages');
-            assert(links[1] === 'https://github.com/safonovpro');
-            assert(links[2] === 'https://safonov.pro/');
+            assert(links[0].href === 'https://github.com/safonovpro/node-crawler-web-pages' && links[0].url === false );
+            assert(links[1].href === '/other/path' && links[1].url === 'http://example.com/other/path' );
+            assert(links[2].href === 'other/path' && links[2].url === 'http://example.com/some/other/path' );
         });
     });
 });
