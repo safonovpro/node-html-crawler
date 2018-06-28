@@ -1,7 +1,7 @@
 const fs =      require('fs');
 const assert =  require('chai').assert;
 const config =  require('./crawler.config');
-const Crawler = require('../classes/crawler');
+const Crawler = require('../crawler');
 
 const crawler = new Crawler();
 

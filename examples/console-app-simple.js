@@ -1,5 +1,5 @@
 const commandLineArgs = require('command-line-args');
-const Crawler = require('./../classes/crawler');
+const Crawler = require('../crawler');
 
 const config = commandLineArgs([
     {name: 'protocol', alias: 'p', defaultValue: 'http:'},

@@ -2,7 +2,7 @@
   "name": "crawler-web-pages",
   "version": "1.0.0",
   "description": "Crawler (spider) of site web pages by domain name",
-  "main": "index.js",
+  "main": "crawler.js",
   "scripts": {
     "test": "node ./node_modules/mocha/bin/mocha tests/*.test.js"
   },
