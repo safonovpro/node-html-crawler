@@ -19,57 +19,68 @@ Install with npm:
 
 Include module in script:
 
-    const Crawler = require('node-crawler');
+```js
+const Crawler = require('node-crawler');
+```
 
 Create instance of a class `Crawler` by passing the domain name:
 
-    const crawler = Crawler({domain: 'example.com'});
+```js
+const crawler = Crawler({domain: 'example.com'});
+```
 
 Start crawling and subscribe to events:
 
-    crawler.crawl();
-    crawler.on('data', data => { ... }); // some html-page a loaded
-    crawler.on('error', error => { ... }); // error in crawling
-    crawler.on('end', () => { ... }); // all pages found are crawled and loaded
+```js
+crawler.crawl();
+crawler.on('data', data => { ... }); // some html-page a loaded
+crawler.on('error', error => { ... }); // error in crawling
+crawler.on('end', () => { ... }); // all pages found are crawled and loaded
+```
     
 When creating an instance of a class, you can pass parameters:
 
-    crawler.crawl({
-        protocol: 'https:', // default 'http:'
-        domain: 'safonov.pro' // default 'example.com'
-        limitForConnections: 15, // number of simultaneous connections, default 10
-        limitForRedirects: 5, // possible number of redirects, default 3
-        timeout: 500 // number of milliseconds between pending connection, default 100 
-    });
+```js
+crawler.crawl({
+    protocol: 'https:', // default 'http:'
+    domain: 'safonov.pro', // default 'example.com'
+    limitForConnections: 15, // number of simultaneous connections, default 10
+    limitForRedirects: 5, // possible number of redirects, default 3
+    timeout: 500 // number of milliseconds between pending connection, default 100 
+});
+```
     
 Event `date` returns the following data:
 
+```js
     {
         
     }
+```
 
 ## Examples
 
 ### Simple console application
 
 The application finds all the URLs and outputs to the console the server response code and the full URL of the document.
+```js
+const commandLineArgs = require('command-line-args');
+const Crawler = require('../crawler');
 
-    const commandLineArgs = require('command-line-args');
-    const Crawler = require('../crawler');
-    
-    const config = commandLineArgs([
-        {name: 'protocol', alias: 'p', defaultValue: 'http:'},
-        {name: 'domain', alias: 'd', defaultValue: 'safonov.pro'},
-        {name: 'connections', alias: 'c'},
-        {name: 'redirects', alias: 'r'},
-        {name: 'timeout', alias: 't'}
-    ]);
-    const crawler = new Crawler(config);
-    
-    crawler.crawl();
-    crawler.on('data', data => console.log(data.result.statusCode, data.url));
-    crawler.on('error', error => console.error(error));
-    crawler.on('end', () => console.log(`Finish! All urls on domain ${config.domain} a crawled!`));
+const config = commandLineArgs([
+    {name: 'protocol', alias: 'p', defaultValue: 'http:'},
+    {name: 'domain', alias: 'd', defaultValue: 'safonov.pro'},
+    {name: 'connections', alias: 'c'},
+    {name: 'redirects', alias: 'r'},
+    {name: 'timeout', alias: 't'}
+]);
+const crawler = new Crawler(config);
+
+crawler.crawl();
+crawler.on('data', data => console.log(data.result.statusCode, data.url));
+crawler.on('error', error => console.error(error));
+crawler.on('end', () => console.log(`Finish! All urls on domain ${config.domain} a crawled!`));
+```
 
 ### Find bad internal links on site
 
