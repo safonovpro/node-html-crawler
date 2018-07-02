@@ -72,20 +72,23 @@ describe('Class Crawler', () => {
         let results = [];
         let isEnded = false;
 
-        for (let i = 0; i < countOfLinks; i++)
+        for (let i = 0; i < countOfLinks; i++) {
             crawler.foundLinks.add(`link-${i}`);
+        }
 
         crawler.on('data', data => results.push(data));
         crawler.on('end', () => isEnded = true);
 
-        for (let i = 0; i < countOfLinks; i++)
+        for (let i = 0; i < countOfLinks; i++) {
             crawler._generateEvents('data', {currentUrl: `current-url-${i}`, result: `result-${i}`});
+        }
 
         it('Events "data"', () => {
             assert(results.length === countOfLinks);
 
-            for(let i = 0; i < countOfLinks; i++)
+            for(let i = 0; i < countOfLinks; i++) {
                 assert(results[i].url === `current-url-${i}` && results[i].result === `result-${i}`);
+            }
         });
 
         it('Events "end"', () => {
