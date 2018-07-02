@@ -112,7 +112,7 @@ const crawler = new Crawler(config);
 crawler.crawl();
 crawler.on('data', data => save(data.url, data.result.body));
 crawler.on('error', error => console.error(error));
-crawler.on('end', () => console.log(`All pages from domain ${config.domain} a saved in folder ${__dirname}/${config.domain}!`));
+crawler.on('end', () => console.log(`All pages a saved in folder ${__dirname}/${config.domain}!`));
 
 function save(urlString, html) {
     if(!urlString || !html) return false;
