@@ -8,15 +8,16 @@ class Crawler extends EventEmitter {
     constructor(config) {
         super();
 
-        this.config = config || {};
+        this.config = (typeof config === 'object') ? config : {};
 
-        // Default values
+        // Default config values
         this.config.protocol = (this.config.protocol === undefined) ? 'http:' : this.config.protocol.trim();
-        this.config.domain = (this.config.domain === undefined) ? 'example.com' : this.config.domain.trim();
+        this.config.domain = (typeof config === 'string') ? config.trim() : (this.config.domain === undefined) ? 'example.com' : this.config.domain.trim();
         this.config.limitForConnections = (this.config.limitForConnections === undefined) ? 10 : parseInt(this.config.limitForConnections);
         this.config.limitForRedirects = (this.config.limitForRedirects === undefined) ? 3 : parseInt(this.config.limitForRedirects);
         this.config.timeout = (this.config.timeout === undefined) ? 100 : parseInt(this.config.timeout);
 
+        // Other params
         this.countOfConnections = 0;
         this.startUrl = `${this.config.protocol}//${this.config.domain}/`;
         this.foundLinks = new Set();

@@ -3,15 +3,45 @@ const assert =  require('chai').assert;
 const config =  require('./crawler.config');
 const Crawler = require('../crawler');
 
-const crawler = new Crawler();
+const firstCrawlerForTest = new Crawler();
 
 describe('Class Crawler', () => {
+    describe('Method constructor', () => {
+        const domain = 'safonov.pro';
+        const secondCrawlerForTest = new Crawler(domain);
+        const settingsForTherdCrawler = {
+            protocol: 'https:',
+            domain: 'safonov.pro',
+            limitForConnections: 30,
+            limitForRedirects: 5,
+            timeout: 500
+        };
+        const thirdCrawlerForTest = new Crawler(settingsForTherdCrawler);
+
+        it('Set domain by string, other setting by default', () => {
+            assert(secondCrawlerForTest.config.domain === domain);
+            // Default settings
+            assert(secondCrawlerForTest.config.protocol === 'http:');
+            assert(secondCrawlerForTest.config.limitForConnections === 10);
+            assert(secondCrawlerForTest.config.limitForRedirects === 3);
+            assert(secondCrawlerForTest.config.timeout === 100);
+        });
+
+        it('Costume settings', () => {
+            assert(thirdCrawlerForTest.config.protocol === settingsForTherdCrawler.protocol);
+            assert(thirdCrawlerForTest.config.domain === settingsForTherdCrawler.domain);
+            assert(thirdCrawlerForTest.config.limitForConnections === settingsForTherdCrawler.limitForConnections);
+            assert(thirdCrawlerForTest.config.limitForRedirects === settingsForTherdCrawler.limitForRedirects);
+            assert(thirdCrawlerForTest.config.timeout === settingsForTherdCrawler.timeout);
+        });
+    });
+
     describe('Method _getDataByURL', () => {
         for(let protocol of ['http', 'https']) {
             const url = `${protocol}://example.com/`;
 
             it(`Method GET, URL is ${url}`, () => {
-                return crawler._getDataByUrl(url, 'GET')
+                return firstCrawlerForTest._getDataByUrl(url, 'GET')
                     .then(result => {
                         assert(typeof result.requestMethod === 'string' && result.requestMethod === 'GET');
                         assert(typeof result.statusCode === 'number' && result.statusCode === 200);
@@ -23,7 +53,7 @@ describe('Class Crawler', () => {
         }
 
         it(`Method HEAD, URL is http://yandex.ru/`, () => {
-            return crawler._getDataByUrl('http://yandex.ru/')
+            return firstCrawlerForTest._getDataByUrl('http://yandex.ru/')
                 .then(result => {
                     assert(typeof result.requestMethod === 'string' && result.requestMethod === 'HEAD');
                     assert(typeof result.statusCode === 'number' && /30\d/.test(result.statusCode));
@@ -39,7 +69,7 @@ describe('Class Crawler', () => {
         for(let url in conditions) {
             if(conditions.hasOwnProperty(url)) {
                 it(`${url} an internal and not only hash?`, () => {
-                    assert(crawler._isInterestingUrl(url) === conditions[url]);
+                    assert(firstCrawlerForTest._isInterestingUrl(url) === conditions[url]);
                 });
             }
         }
@@ -50,14 +80,14 @@ describe('Class Crawler', () => {
 
         for(let condition of conditions) {
             it(`Full url from ${condition.in.urlString}`, () => {
-                assert(crawler._getInterestingFullUrlWithoutAuthAndHash(condition.in.urlString, condition.in.parentUrl, condition.in.parentTagBaseHrefValue) === condition.out);
+                assert(firstCrawlerForTest._getInterestingFullUrlWithoutAuthAndHash(condition.in.urlString, condition.in.parentUrl, condition.in.parentTagBaseHrefValue) === condition.out);
             });
         }
     });
 
     describe('Method _getUrlsOnHtml', () => {
         const html = fs.readFileSync(`${__dirname}/src/page-with-links.html`, 'utf-8');
-        const links = crawler._getUrlsOnHtml('http://example.com/some/path', html);
+        const links = firstCrawlerForTest._getUrlsOnHtml('http://example.com/some/path', html);
 
         it(`Links from page ${__dirname}/src/page-with-links.html`, () => {
             assert(links.length === 3);
@@ -73,14 +103,14 @@ describe('Class Crawler', () => {
         let isEnded = false;
 
         for (let i = 0; i < countOfLinks; i++) {
-            crawler.foundLinks.add(`link-${i}`);
+            firstCrawlerForTest.foundLinks.add(`link-${i}`);
         }
 
-        crawler.on('data', data => results.push(data));
-        crawler.on('end', () => isEnded = true);
+        firstCrawlerForTest.on('data', data => results.push(data));
+        firstCrawlerForTest.on('end', () => isEnded = true);
 
         for (let i = 0; i < countOfLinks; i++) {
-            crawler._generateEvents('data', {currentUrl: `current-url-${i}`, result: `result-${i}`});
+            firstCrawlerForTest._generateEvents('data', {currentUrl: `current-url-${i}`, result: `result-${i}`});
         }
 
         it('Events "data"', () => {
