@@ -53,9 +53,26 @@ crawler.crawl({
 Event `date` returns the following data:
 
 ```js
-    {
-        
+{
+    url: 'http://example.com/some/path',
+    result: {
+      requestMethod: 'HEAD', // or GET for html-page
+      statusCode: 200,
+      headers: {
+          server: 'Apache/2.4.7 (Ubuntu)',
+          'content-type': 'text/html; charset=UTF-8'
+          // and other headers
+      },
+      body: '<html>...</html>', // html content
+      links: [ // found links in html content
+          {
+              href: '/other/path', // value attr href in html page
+              url: 'http://example.com/other/path' // full internal links, for external is false
+          },
+          // other found links
+      ]
     }
+}
 ```
 
 ## Examples
