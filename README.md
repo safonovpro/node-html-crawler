@@ -64,7 +64,7 @@ Event `date` returns the following data:
           // and other headers
       },
       body: '<html>...</html>', // html content
-      links: [ // found links in html content
+      links: [ // found links in html content, for 301 only one item
           {
               href: '/other/path', // value attr href in html page
               url: 'http://example.com/other/path' // full internal links, for external is false
