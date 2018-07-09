@@ -45,9 +45,14 @@ class Crawler extends EventEmitter {
                                     this._generateEvents('error', {currentUrl, error});
                                 });
                         } else if(/30\d/.test(result.statusCode)) {
-                            const nextUrl = this._getInterestingFullUrlWithoutAuthAndHash(result.headers['location'], currentUrl);
+                            const location = result.headers['location'];
+                            const nextUrl = this._getInterestingFullUrlWithoutAuthAndHash(location, currentUrl);
 
-                            if(nextUrl) this.crawl(nextUrl, ++countOfRedirects);
+                            if(nextUrl) {
+                                result.links.push({href: location, url: nextUrl});
+
+                                this.crawl(nextUrl, ++countOfRedirects);
+                            }
 
                             this._generateEvents('data', {currentUrl, result});
                         } else {
