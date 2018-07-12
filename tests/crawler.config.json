@@ -28,6 +28,10 @@
     {"in": {"urlString": "some/path?a=1&b=2#hash", "parentUrl": "http://example.com/some/path", "parentTagBaseHrefValue": "http://example.com/"}, "out": "http://example.com/some/path?a=1&b=2"},
     {"in": {"urlString": "/some/path?a=1&b=2#hash", "parentUrl": "http://example.com/some/path/page.html"}, "out": "http://example.com/some/path?a=1&b=2"},
     {"in": {"urlString": "some/path?a=1&b=2#hash", "parentUrl": "http://example.com/some/path/page.html"}, "out": "http://example.com/some/path/some/path?a=1&b=2"},
+    {"in": {"urlString": "./another-page.html", "parentUrl": "http://example.com/some/path/page.html"}, "out": "http://example.com/some/path/another-page.html"},
+    {"in": {"urlString": "../../path/another-page.html", "parentUrl": "http://example.com/some/path/page.html"}, "out": "http://example.com/path/another-page.html"},
+    {"in": {"urlString": "../another-page.html", "parentUrl": "http://example.com/"}, "out": "http://example.com/another-page.html"},
+    {"in": {"urlString": "/../another-page.html", "parentUrl": "http://example.com/"}, "out": "http://example.com/another-page.html"},
     {"in": {"urlString": "#hash"}, "out": false}
   ]
 }
