@@ -87,7 +87,7 @@ class Crawler extends EventEmitter {
             } else if(/^\//.test(urlObject.pathname)) {
                 result = parentUrlObject.protocol + '//' + parentUrlObject.host + urlObject.path;
             } else {
-                result = parentUrlObject.protocol + '//' + parentUrlObject.host + parentUrlObject.path.replace(/[^\/]*$/,'') + urlObject.path;
+                result = parentUrlObject.protocol + '//' + parentUrlObject.host + parentUrlObject.path.replace(/[^\/]*$/,'') + urlObject.path.replace(/^\.\//, '');
             }
         }
 
