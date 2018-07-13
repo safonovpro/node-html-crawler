@@ -91,6 +91,8 @@ class Crawler extends EventEmitter {
             }
         }
 
+        result = this._removeDotsInUrl(result);
+
         return result;
     }
 
@@ -107,6 +109,28 @@ class Crawler extends EventEmitter {
         } else if(!urlObject.protocol && !urlObject.host && urlObject.path) {
             result = true;
         }
+
+        return result;
+    }
+
+    _removeDotsInUrl(url) {
+        const urlArray = url.split('/');
+        let countOfDotted = 0;
+        let result = '';
+
+        for (let i = urlArray.length - 1; i > 2; i--) {
+            if(urlArray[i] === '..') {
+                countOfDotted++;
+            } else {
+                if(countOfDotted === 0) {
+                    result = `${urlArray[i]}${(i === urlArray.length - 1) ? '' : '/'}` + result;
+                } else {
+                    countOfDotted--;
+                }
+            }
+        }
+
+        result = `${urlArray[0]}//${urlArray[2]}/${result}`;
 
         return result;
     }

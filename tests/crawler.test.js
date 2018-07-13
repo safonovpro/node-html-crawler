@@ -63,6 +63,16 @@ describe('Class Crawler', () => {
         });
     });
 
+    describe('Method _getInterestingFullUrlWithoutAuthAndHash', () => {
+        const conditions = config['_getInterestingFullUrlWithoutAuthAndHash'];
+
+        for(let condition of conditions) {
+            it(`Full url from ${condition.in.urlString}`, () => {
+                assert(firstCrawlerForTest._getInterestingFullUrlWithoutAuthAndHash(condition.in.urlString, condition.in.parentUrl, condition.in.parentTagBaseHrefValue) === condition.out);
+            });
+        }
+    });
+
     describe('Method _isInterestingUrl', () => {
         const conditions = config['_isInterestingUrl'];
 
@@ -75,12 +85,12 @@ describe('Class Crawler', () => {
         }
     });
 
-    describe('Method _getInterestingFullUrlWithoutAuthAndHash', () => {
-        const conditions = config['_getInterestingFullUrlWithoutAuthAndHash'];
+    describe('Method _removeDotsInUrl', () => {
+        const conditions = config['_removeDotsInUrl'];
 
-        for(let condition of conditions) {
-            it(`Full url from ${condition.in.urlString}`, () => {
-                assert(firstCrawlerForTest._getInterestingFullUrlWithoutAuthAndHash(condition.in.urlString, condition.in.parentUrl, condition.in.parentTagBaseHrefValue) === condition.out);
+        for(let url in conditions) {
+            it(`${url} without sots is ${conditions[url]}`, () => {
+                assert(firstCrawlerForTest._removeDotsInUrl(url) === conditions[url]);
             });
         }
     });
