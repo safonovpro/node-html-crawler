@@ -19,7 +19,7 @@ crawler.on('data', data => {
 });
 crawler.on('error', error => console.error(error));
 crawler.on('end', () => {
-    fs.writeFileSync(`${__dirname}/result.csv`, 'url;href;status\r\n');
+    fs.writeFileSync(`${__dirname}/${domain}.csv`, 'url;href;status\r\n');
 
     for(let pageIndex in siteTree.pages) {
         const urlOfPage = siteTree.pages[pageIndex].url;
