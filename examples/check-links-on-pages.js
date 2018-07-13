@@ -13,6 +13,8 @@ crawler.on('data', data => {
         links: data.result.links
     });
 
+    process.stdout.write(`\r${crawler.countOfProcessedUrls} out of ${crawler.foundLinks.size}`);
+
     if(/30\d/.test(data.result.statusCode)) siteTree.redirects[data.url] = data.result.links[0].url;
 });
 crawler.on('error', error => console.error(error));
@@ -34,7 +36,7 @@ crawler.on('end', () => {
         }
     }
 
-    console.log(`Finish! All links on page on domain ${domain} a checked!`);
+    console.log(`\r\nFinish! All ${crawler.foundLinks.size} links on pages on domain ${domain} a checked!`);
 });
 
 function getFinalStatusCodeOfRedirects(url) {
