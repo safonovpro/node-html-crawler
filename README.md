@@ -26,7 +26,19 @@ const Crawler = require('node-crawler');
 Create instance of a class `Crawler` by passing the domain name:
 
 ```js
-const crawler = Crawler({domain: 'example.com'});
+const crawler = Crawler('example.com');
+```
+
+Or with more advanced settings:
+
+```js
+const crawler = Crawler({
+    protocol: 'https:', // default 'http:'
+    domain: 'safonov.pro', // default 'example.com'
+    limitForConnections: 15, // number of simultaneous connections, default 10
+    limitForRedirects: 5, // possible number of redirects, default 3
+    timeout: 500 // number of milliseconds between pending connection, default 100 
+});
 ```
 
 Start crawling and subscribe to events:
@@ -36,18 +48,6 @@ crawler.crawl();
 crawler.on('data', data => { ... }); // some html-page a loaded
 crawler.on('error', error => { ... }); // error in crawling
 crawler.on('end', () => { ... }); // all pages found are crawled and loaded
-```
-    
-When creating an instance of a class, you can pass parameters:
-
-```js
-crawler.crawl({
-    protocol: 'https:', // default 'http:'
-    domain: 'safonov.pro', // default 'example.com'
-    limitForConnections: 15, // number of simultaneous connections, default 10
-    limitForRedirects: 5, // possible number of redirects, default 3
-    timeout: 500 // number of milliseconds between pending connection, default 100 
-});
 ```
     
 Event `date` returns the following data:
@@ -94,30 +94,70 @@ crawler.on('end', () => console.log(`Finish! All urls on domain ${domain} a craw
 
 ### Find bad internal links on site
 
-Application ... 
+Application looks for links on all pages of the site and save their statuses in the csv-file. Thus, you can find links with 40 *, 50 * statuses.
 
 ```js
+const fs = require('fs');
+const Crawler = require('../crawler');
 
+const domain = process.argv[2];
+const crawler = new Crawler(domain);
+const siteTree = {pages: [], urls: {}, redirects: {}};
+
+crawler.crawl();
+crawler.on('data', data => {
+    siteTree.urls[data.url] = data.result.statusCode;
+    siteTree.pages.push({
+        url: data.url,
+        links: data.result.links
+    });
+
+    process.stdout.write(`\r${crawler.countOfProcessedUrls} out of ${crawler.foundLinks.size}`);
+
+    if(/30\d/.test(data.result.statusCode)) siteTree.redirects[data.url] = data.result.links[0].url;
+});
+crawler.on('error', error => console.error(error));
+crawler.on('end', () => {
+    fs.writeFileSync(`${__dirname}/result.csv`, 'url;href;status\r\n');
+
+    for(let pageIndex in siteTree.pages) {
+        const urlOfPage = siteTree.pages[pageIndex].url;
+
+        for(let linkIndex in siteTree.pages[pageIndex].links) {
+            const urlOfLink = siteTree.pages[pageIndex].links[linkIndex].url;
+
+            if(urlOfLink) {
+                const hrefOfLink = siteTree.pages[pageIndex].links[linkIndex].href;
+                const statusCodeOfLink = (/30\d/.test(siteTree.urls[urlOfLink])) ? getFinalStatusCodeOfRedirects(urlOfLink) : siteTree.urls[urlOfLink];
+
+                fs.appendFileSync(`${__dirname}/result.csv`, `${urlOfPage};${hrefOfLink};${statusCodeOfLink}\r\n`);
+            }
+        }
+    }
+
+    console.log(`\r\nFinish! All ${crawler.foundLinks.size} links on pages on domain ${domain} a checked!`);
+});
+
+function getFinalStatusCodeOfRedirects(url) {
+    if(/30\d/.test(siteTree.urls[url])) {
+        return getFinalStatusCodeOfRedirects(siteTree.redirects[url]);
+    } else {
+        return siteTree.urls[url];
+    }
+}
 ```
 
 ### Download all html-pages from site
 
-Application
+Application downloads all the html-pages of the site by sorting them into folders.
 
 ```js
 const fs = require('fs');
 const url = require('url');
-const commandLineArgs = require('command-line-args');
 const Crawler = require('../crawler');
 
-const config = commandLineArgs([
-    {name: 'protocol', alias: 'p', defaultValue: 'http:'},
-    {name: 'domain', alias: 'd', defaultValue: 'safonov.pro'},
-    {name: 'connections', alias: 'c'},
-    {name: 'redirects', alias: 'r'},
-    {name: 'timeout', alias: 't'}
-]);
-const crawler = new Crawler(config);
+const domain = process.argv[2];
+const crawler = new Crawler(domain);
 
 crawler.crawl();
 crawler.on('data', data => save(data.url, data.result.body));
