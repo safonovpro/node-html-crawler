@@ -94,7 +94,7 @@ crawler.on('end', () => console.log(`Finish! All urls on domain ${domain} a craw
 
 ### Find bad internal links on site
 
-Application looks for links on all pages of the site and save their statuses in the csv-file. Thus, you can find links with 40 *, 50 * statuses.
+Application looks for links on all pages of the site and save their statuses in the csv-file. Thus, you can find bad internal links.
 
 ```js
 const fs = require('fs');
