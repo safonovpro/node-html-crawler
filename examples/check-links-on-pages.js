@@ -19,7 +19,9 @@ crawler.on('data', data => {
 });
 crawler.on('error', error => console.error(error));
 crawler.on('end', () => {
-    fs.writeFileSync(`${__dirname}/${domain}.csv`, 'url;href;status\r\n');
+    const resultFilePath = `${__dirname}/${domain}.csv`;
+
+    fs.writeFileSync(resultFilePath, 'url;href;status\r\n');
 
     for(let pageIndex in siteTree.pages) {
         const urlOfPage = siteTree.pages[pageIndex].url;
@@ -31,7 +33,7 @@ crawler.on('end', () => {
                 const hrefOfLink = siteTree.pages[pageIndex].links[linkIndex].href;
                 const statusCodeOfLink = (/30\d/.test(siteTree.urls[urlOfLink])) ? getFinalStatusCodeOfRedirects(urlOfLink) : siteTree.urls[urlOfLink];
 
-                fs.appendFileSync(`${__dirname}/result.csv`, `${urlOfPage};${hrefOfLink};${statusCodeOfLink}\r\n`);
+                fs.appendFileSync(resultFilePath, `${urlOfPage};${hrefOfLink};${statusCodeOfLink}\r\n`);
             }
         }
     }
