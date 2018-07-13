@@ -1,5 +1,5 @@
 {
-  "name": "crawler-web-pages",
+  "name": "node-crawler",
   "version": "1.0.0",
   "description": "Crawler (spider) of site web pages by domain name",
   "main": "crawler.js",
