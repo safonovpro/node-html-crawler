@@ -19,6 +19,7 @@ class Crawler extends EventEmitter {
 
         // Other params
         this.countOfConnections = 0;
+        this.waitingOfConnection = 0;
         this.startUrl = `${this.config.protocol}//${this.config.domain}/`;
         this.foundLinks = new Set();
         this.countOfProcessedUrls = 0;
@@ -62,7 +63,10 @@ class Crawler extends EventEmitter {
                         this._generateEvents('error', {currentUrl, error});
                     });
             } else {
+                this.waitingOfConnection++;
+
                 setTimeout(() => {
+                    this.waitingOfConnection--;
                     this.crawl(currentUrl, countOfRedirects);
                 }, this.config.timeout);
             }
@@ -200,7 +204,7 @@ class Crawler extends EventEmitter {
             this.countOfProcessedUrls++;
             this.emit('data', {url: data.currentUrl, result: data.result});
 
-            if(this.countOfProcessedUrls === this.foundLinks.size) this.emit('end');
+            if(this.waitingOfConnection === 0 && this.countOfProcessedUrls === this.foundLinks.size) this.emit('end');
         } else if(eventsType === 'error') {
             this.emit('error', new Error(`Error in ${data.currentUrl}: ${data.error}`));
         }
