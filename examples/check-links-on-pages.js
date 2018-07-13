@@ -15,7 +15,7 @@ crawler.on('data', data => {
 
     process.stdout.write(`\r${crawler.countOfProcessedUrls} out of ${crawler.foundLinks.size}`);
 
-    if(/30\d/.test(data.result.statusCode)) siteTree.redirects[data.url] = data.result.links[0].url;
+    if(/30\d/.test(data.result.statusCode) && data.result.links.length) siteTree.redirects[data.url] = data.result.links[0].url;
 });
 crawler.on('error', error => console.error(error));
 crawler.on('end', () => {
