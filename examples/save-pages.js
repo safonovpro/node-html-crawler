@@ -1,16 +1,9 @@
 const fs = require('fs');
 const url = require('url');
-const commandLineArgs = require('command-line-args');
 const Crawler = require('../crawler');
 
-const config = commandLineArgs([
-    {name: 'protocol', alias: 'p', defaultValue: 'http:'},
-    {name: 'domain', alias: 'd', defaultValue: 'safonov.pro'},
-    {name: 'connections', alias: 'c'},
-    {name: 'redirects', alias: 'r'},
-    {name: 'timeout', alias: 't'}
-]);
-const crawler = new Crawler(config);
+const domain = process.argv[2];
+const crawler = new Crawler(domain);
 
 crawler.crawl();
 crawler.on('data', data => save(data.url, data.result.body));
