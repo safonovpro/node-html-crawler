@@ -8,14 +8,14 @@ const crawler = new Crawler(domain);
 crawler.crawl();
 crawler.on('data', data => save(data.url, data.result.body));
 crawler.on('error', error => console.error(error));
-crawler.on('end', () => console.log(`All pages a saved in folder ${__dirname}/${config.domain}!`));
+crawler.on('end', () => console.log(`All pages a saved in folder ${__dirname}/${domain}!`));
 
 function save(urlString, html) {
     if(!urlString || !html) return false;
 
     const urlObject = url.parse(urlString);
     const pathArray = urlObject.pathname.split('/');
-    let path = `${__dirname}/${config.domain}`;
+    let path = `${__dirname}/${domain}`;
 
     if(!fs.existsSync(path)) fs.mkdirSync(path);
 
