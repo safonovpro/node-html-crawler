@@ -1,3 +1,5 @@
+![logo node crawler](./logo.png)
+
 # Crawler of web-pages for node.js
 
 **Simple in use crawler** (spider) of site web pages by domain name.
