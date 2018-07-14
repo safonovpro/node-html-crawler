@@ -1,6 +1,6 @@
 # Crawler of web-pages for node.js
 
-**Simple for use crawler** (spider) of site web pages by domain name.
+**Simple in use crawler** (spider) of site web pages by domain name.
 Written for node.js, using ES6.
 Provides a very simple event interface using `EventEmitter`.
 Be sure, by reading the instruction and examples.
@@ -50,7 +50,7 @@ crawler.on('error', error => { ... }); // error in crawling
 crawler.on('end', () => { ... }); // all pages found are crawled and loaded
 ```
     
-Event `date` returns the following data:
+Event `data` returns the following data:
 
 ```js
 {
@@ -79,7 +79,10 @@ Event `date` returns the following data:
 
 ### Simple console application
 
-The application finds all the URLs and outputs to the console the server response code and the full URL of the document.
+Application finds all the URLs and outputs to the console the server response code and the full URL of the document.
+
+    node example/simple-app.js safonov.pro
+
 ```js
 const Crawler = require('../crawler');
 
@@ -94,7 +97,9 @@ crawler.on('end', () => console.log(`Finish! All urls on domain ${domain} a craw
 
 ### Find bad internal links on site
 
-Application looks for links on all pages of the site and save their statuses in the csv-file. Thus, you can find bad internal links.
+Application looks for links on all pages of the site and saves their statuses in the csv-file. Thus, you can find bad internal links.
+
+    node example/check-ex-links-on-domain.js safonov.pro
 
 ```js
 const fs = require('fs');
@@ -114,11 +119,13 @@ crawler.on('data', data => {
 
     process.stdout.write(`\r${crawler.countOfProcessedUrls} out of ${crawler.foundLinks.size}`);
 
-    if(/30\d/.test(data.result.statusCode)) siteTree.redirects[data.url] = data.result.links[0].url;
+    if(/30\d/.test(data.result.statusCode) && data.result.links.length) siteTree.redirects[data.url] = data.result.links[0].url;
 });
 crawler.on('error', error => console.error(error));
 crawler.on('end', () => {
-    fs.writeFileSync(`${__dirname}/result.csv`, 'url;href;status\r\n');
+    const resultFilePath = `${__dirname}/${domain}.csv`;
+
+    fs.writeFileSync(resultFilePath, 'url;href;status\r\n');
 
     for(let pageIndex in siteTree.pages) {
         const urlOfPage = siteTree.pages[pageIndex].url;
@@ -130,7 +137,7 @@ crawler.on('end', () => {
                 const hrefOfLink = siteTree.pages[pageIndex].links[linkIndex].href;
                 const statusCodeOfLink = (/30\d/.test(siteTree.urls[urlOfLink])) ? getFinalStatusCodeOfRedirects(urlOfLink) : siteTree.urls[urlOfLink];
 
-                fs.appendFileSync(`${__dirname}/result.csv`, `${urlOfPage};${hrefOfLink};${statusCodeOfLink}\r\n`);
+                fs.appendFileSync(resultFilePath, `${urlOfPage};${hrefOfLink};${statusCodeOfLink}\r\n`);
             }
         }
     }
@@ -150,6 +157,8 @@ function getFinalStatusCodeOfRedirects(url) {
 ### Download all html-pages from site
 
 Application downloads all the html-pages of the site by sorting them into folders.
+
+    node examples/save-pages.js safonov.pro
 
 ```js
 const fs = require('fs');
