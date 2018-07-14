@@ -1,5 +1,8 @@
 ![logo node crawler](./logo.png)
 
+![test results](https://travis-ci.org/safonovpro/node-crawler.svg?branch=master)
+![dependencies](https://david-dm.org/safonovpro/node-crawler/status.svg)
+
 # Crawler of web-pages for node.js
 
 **Simple in use crawler** (spider) of site web pages by domain name.
