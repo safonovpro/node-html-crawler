@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/safonovpro/node-crawler-web-pages.git"
+    "url": "git+https://github.com/safonovpro/node-crawler.git"
   },
   "keywords": [
     "node",
@@ -22,9 +22,9 @@
   "author": "Alexey V Safonov",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/safonovpro/node-crawler-web-pages/issues"
+    "url": "https://github.com/safonovpro/node-crawler/issues"
   },
-  "homepage": "https://github.com/safonovpro/node-crawler-web-pages#readme",
+  "homepage": "https://github.com/safonovpro/node-crawler#readme",
   "devDependencies": {
     "chai": "^4.1.2",
     "mocha": "^5.2.0"
