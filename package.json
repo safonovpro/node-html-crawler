@@ -1,5 +1,5 @@
 {
-  "name": "node-crawler",
+  "name": "node-html-cawler",
   "version": "1.0.0",
   "description": "Crawler (spider) of site web pages by domain name",
   "main": "crawler.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/safonovpro/node-crawler.git"
+    "url": "git+https://github.com/safonovpro/node-html-cawler.git"
   },
   "keywords": [
     "node",
@@ -22,9 +22,9 @@
   "author": "Alexey V Safonov",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/safonovpro/node-crawler/issues"
+    "url": "https://github.com/safonovpro/node-html-cawler/issues"
   },
-  "homepage": "https://github.com/safonovpro/node-crawler#readme",
+  "homepage": "https://github.com/safonovpro/node-html-cawler#readme",
   "devDependencies": {
     "chai": "^4.1.2",
     "mocha": "^5.2.0"
