@@ -15,7 +15,7 @@ crawler.on('data', data => {
 
     process.stdout.write(`\r${crawler.countOfProcessedUrls} out of ${crawler.foundLinks.size}`);
 
-    if(/30\d/.test(data.result.statusCode) && data.result.links.length) siteTree.redirects[data.url] = data.result.links[0].url;
+    if(/30\d/.test(data.result.statusCode) && data.result.links[0].url) siteTree.redirects[data.url] = data.result.links[0].url;
 });
 crawler.on('error', error => console.error(error));
 crawler.on('end', () => {
@@ -33,7 +33,9 @@ crawler.on('end', () => {
                 const hrefOfLink = siteTree.pages[pageIndex].links[linkIndex].href;
                 const statusCodeOfLink = (/30\d/.test(siteTree.urls[urlOfLink])) ? getFinalStatusCodeOfRedirects(urlOfLink) : siteTree.urls[urlOfLink];
 
-                fs.appendFileSync(resultFilePath, `${urlOfPage};${hrefOfLink};${statusCodeOfLink}\r\n`);
+                if(statusCodeOfLink) {
+                    fs.appendFileSync(resultFilePath, `${urlOfPage};${hrefOfLink};${statusCodeOfLink}\r\n`);
+                }
             }
         }
     }

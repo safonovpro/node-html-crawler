@@ -49,9 +49,9 @@ class Crawler extends EventEmitter {
                             const location = result.headers['location'];
                             const nextUrl = this._getInterestingFullUrlWithoutAuthAndHash(location, currentUrl);
 
-                            if(nextUrl) {
-                                result.links.push({href: location, url: nextUrl});
+                            result.links.push({href: location, url: nextUrl});
 
+                            if(nextUrl) {
                                 this.crawl(nextUrl, ++countOfRedirects);
                             }
 
