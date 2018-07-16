@@ -20,7 +20,7 @@ Be sure, by reading the instruction and examples.
 
 Install with npm:
 
-    npm install node-crawler --save
+    npm install node-html-crawler --save
 
 Include module in script:
 
