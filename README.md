@@ -1,7 +1,11 @@
 ![logo node crawler](./logo.png)
 
-![test results](https://travis-ci.org/safonovpro/node-crawler.svg?branch=master)
-![dependencies](https://david-dm.org/safonovpro/node-crawler/status.svg)
+
+[![npm package](https://nodei.co/npm/node-html-crawler.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/node-html-crawler)
+
+[![build status](https://api.travis-ci.org/safonovpro/node-html-crawler.svg?branch=master)](https://travis-ci.org/safonovpro/node-html-crawler)
+[![dependency status](https://david-dm.org/safonovpro/node-html-crawler/status.svg)](https://david-dm.org/safonovpro/node-html-crawler)
+[![coverage status](https://coveralls.io/repos/github/safonovpro/node-html-crawler/badge.svg?branch=master)](https://coveralls.io/github/safonovpro/node-html-crawler?branch=master)
 
 # Crawler of html-pages for node.js
 
