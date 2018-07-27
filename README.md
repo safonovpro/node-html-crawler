@@ -90,7 +90,7 @@ Event `data` returns the following data:
 
 Application finds all the URLs and outputs to the console the server response code and the full URL of the document.
 
-    node example/simple-app.js safonov.pro
+    node examples/simple-app.js safonov.pro
 
 ```js
 const Crawler = require('../crawler');
@@ -108,7 +108,7 @@ crawler.on('end', () => console.log(`Finish! All urls on domain ${domain} a craw
 
 Application looks for links on all pages of the site and saves their statuses in the csv-file. Thus, you can find bad internal links.
 
-    node example/check-ex-links-on-domain.js safonov.pro
+    node examples/check-ex-links-on-domain.js safonov.pro
 
 ```js
 const fs = require('fs');
