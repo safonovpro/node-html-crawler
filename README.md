@@ -5,7 +5,6 @@
 
 [![build status](https://api.travis-ci.org/safonovpro/node-html-crawler.svg?branch=master)](https://travis-ci.org/safonovpro/node-html-crawler)
 [![dependency status](https://david-dm.org/safonovpro/node-html-crawler/status.svg)](https://david-dm.org/safonovpro/node-html-crawler)
-[![coverage status](https://coveralls.io/repos/github/safonovpro/node-html-crawler/badge.svg?branch=master)](https://coveralls.io/github/safonovpro/node-html-crawler?branch=master)
 
 # Crawler of html-pages for node.js
 
