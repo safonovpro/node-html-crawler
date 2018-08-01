@@ -1,6 +1,6 @@
 {
   "name": "node-html-crawler",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Crawler (spider) of site web pages by domain name",
   "main": "crawler.js",
   "scripts": {
