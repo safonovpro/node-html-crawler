@@ -37,15 +37,17 @@ class Crawler extends EventEmitter {
                         if(result.statusCode === 200 && /^text\/html/.test(result.headers['content-type'])) {
                             this._getDataByUrl(currentUrl, 'GET')
                                 .then(result => {
+                                    this._generateEvents('data', {currentUrl, result});
+
                                     for(let link of result.links) {
                                         if(link.url) this.crawl(link.url);
                                     }
-
-                                    this._generateEvents('data', {currentUrl, result});
                                 }).catch(error => {
                                     this._generateEvents('error', {currentUrl, error});
                                 });
                         } else if(/30\d/.test(result.statusCode)) {
+                            this._generateEvents('data', {currentUrl, result});
+
                             const location = result.headers['location'];
                             const nextUrl = this._getInterestingFullUrlWithoutAuthAndHash(location, currentUrl);
 
@@ -54,8 +56,6 @@ class Crawler extends EventEmitter {
                             if(nextUrl) {
                                 this.crawl(nextUrl, ++countOfRedirects);
                             }
-
-                            this._generateEvents('data', {currentUrl, result});
                         } else {
                             this._generateEvents('data', {currentUrl, result});
                         }
