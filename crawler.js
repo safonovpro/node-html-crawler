@@ -46,12 +46,12 @@ class Crawler extends EventEmitter {
                                     this._generateEvents('error', {currentUrl, error});
                                 });
                         } else if(/30\d/.test(result.statusCode)) {
-                            this._generateEvents('data', {currentUrl, result});
-
                             const location = result.headers['location'];
                             const nextUrl = this._getInterestingFullUrlWithoutAuthAndHash(location, currentUrl);
 
                             result.links.push({href: location, url: nextUrl});
+
+                            this._generateEvents('data', {currentUrl, result});
 
                             if(nextUrl) {
                                 this.crawl(nextUrl, ++countOfRedirects);
