@@ -37,11 +37,11 @@ class Crawler extends EventEmitter {
                         if(result.statusCode === 200 && /^text\/html/.test(result.headers['content-type'])) {
                             this._getDataByUrl(currentUrl, 'GET')
                                 .then(result => {
-                                    this._generateEvents('data', {currentUrl, result});
-
                                     for(let link of result.links) {
                                         if(link.url) this.crawl(link.url);
                                     }
+
+                                    this._generateEvents('data', {currentUrl, result});
                                 }).catch(error => {
                                     this._generateEvents('error', {currentUrl, error});
                                 });
@@ -51,11 +51,11 @@ class Crawler extends EventEmitter {
 
                             result.links.push({href: location, url: nextUrl});
 
-                            this._generateEvents('data', {currentUrl, result});
-
                             if(nextUrl) {
                                 this.crawl(nextUrl, ++countOfRedirects);
                             }
+
+                            this._generateEvents('data', {currentUrl, result});
                         } else {
                             this._generateEvents('data', {currentUrl, result});
                         }
