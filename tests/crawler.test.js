@@ -45,7 +45,7 @@ describe('Class Crawler', () => {
                     .then(result => {
                         assert(typeof result.requestMethod === 'string' && result.requestMethod === 'GET');
                         assert(typeof result.statusCode === 'number' && result.statusCode === 200);
-                        assert(typeof result.headers === 'object' && result.headers['content-type'] === 'text/html');
+                        assert(typeof result.headers === 'object' && /^text\/html/.test(result.headers['content-type']));
                         assert(typeof result.body === 'string' && result.body.length > 0);
                         assert(typeof result.links === 'object' && result.links.length === 1 && result.links[0].href === 'http://www.iana.org/domains/example');
                     });
