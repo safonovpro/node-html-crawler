@@ -1,6 +1,6 @@
 {
   "name": "node-html-crawler",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Crawler (spider) of site web pages by domain name",
   "main": "crawler.js",
   "scripts": {
@@ -30,6 +30,6 @@
     "mocha": "^5.2.0"
   },
   "dependencies": {
-    "cheerio": "^1.0.0-rc.2"
+    "cheerio": "^1.0.0-rc.3"
   }
 }
