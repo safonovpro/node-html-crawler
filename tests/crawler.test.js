@@ -7,11 +7,12 @@ const firstCrawlerForTest = new Crawler();
 
 describe('Class Crawler', () => {
     describe('Method constructor', () => {
-        const domain = 'safonov.pro';
+        const domain = 'сафонов.pro';
+        const domainInPunycode = 'xn--80ae6adbow.pro';
         const secondCrawlerForTest = new Crawler(domain);
         const settingsForTherdCrawler = {
             protocol: 'https:',
-            domain: 'safonov.pro',
+            domain,
             limitForConnections: 30,
             limitForRedirects: 5,
             timeout: 500
@@ -19,7 +20,7 @@ describe('Class Crawler', () => {
         const thirdCrawlerForTest = new Crawler(settingsForTherdCrawler);
 
         it('Set domain by string, other setting by default', () => {
-            assert(secondCrawlerForTest.config.domain === domain);
+            assert(secondCrawlerForTest.config.domain === domainInPunycode, `Domain is ${secondCrawlerForTest.config.domain}, not ${domainInPunycode}`);
             // Default settings
             assert(secondCrawlerForTest.config.protocol === 'http:');
             assert(secondCrawlerForTest.config.limitForConnections === 10);
@@ -29,7 +30,7 @@ describe('Class Crawler', () => {
 
         it('Costume settings', () => {
             assert(thirdCrawlerForTest.config.protocol === settingsForTherdCrawler.protocol);
-            assert(thirdCrawlerForTest.config.domain === settingsForTherdCrawler.domain);
+            assert(thirdCrawlerForTest.config.domain === domainInPunycode,  `Domain is ${secondCrawlerForTest.config.domain}, not ${domainInPunycode}`);
             assert(thirdCrawlerForTest.config.limitForConnections === settingsForTherdCrawler.limitForConnections);
             assert(thirdCrawlerForTest.config.limitForRedirects === settingsForTherdCrawler.limitForRedirects);
             assert(thirdCrawlerForTest.config.timeout === settingsForTherdCrawler.timeout);
@@ -82,6 +83,16 @@ describe('Class Crawler', () => {
                     assert(firstCrawlerForTest._isInterestingUrl(url) === conditions[url]);
                 });
             }
+        }
+    });
+
+    describe('Method _removeDotsInUrl', () => {
+        const conditions = config['_removeDotsInUrl'];
+
+        for(let url in conditions) {
+            it(`${url} without sots is ${conditions[url]}`, () => {
+                assert(firstCrawlerForTest._removeDotsInUrl(url) === conditions[url]);
+            });
         }
     });
 

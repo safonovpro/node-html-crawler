@@ -2,6 +2,7 @@ const EventEmitter = require('events');
 const http = require('http');
 const https = require('https');
 const url = require('url');
+const punycode = require('punycode');
 const cheerio = require('cheerio');
 
 class Crawler extends EventEmitter {
@@ -12,7 +13,7 @@ class Crawler extends EventEmitter {
 
         // Default config values
         this.config.protocol = (this.config.protocol === undefined) ? 'http:' : this.config.protocol.trim();
-        this.config.domain = (typeof config === 'string') ? config.trim() : (this.config.domain === undefined) ? 'example.com' : this.config.domain.trim();
+        this.config.domain = (typeof config === 'string') ? punycode.toASCII(config.trim()) : (this.config.domain === undefined) ? 'example.com' : punycode.toASCII(this.config.domain.trim());
         this.config.limitForConnections = (this.config.limitForConnections === undefined) ? 10 : parseInt(this.config.limitForConnections);
         this.config.limitForRedirects = (this.config.limitForRedirects === undefined) ? 3 : parseInt(this.config.limitForRedirects);
         this.config.timeout = (this.config.timeout === undefined) ? 100 : parseInt(this.config.timeout);
