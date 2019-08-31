@@ -64,12 +64,12 @@ describe('Class Crawler', () => {
         });
     });
 
-    describe('Method _getInterestingFullUrlWithoutAuthAndHash', () => {
-        const conditions = config['_getInterestingFullUrlWithoutAuthAndHash'];
+    describe('Method _getInterestingFullUrl', () => {
+        const conditions = config['_getInterestingFullUrl'];
 
         for(let condition of conditions) {
             it(`Full url from ${condition.in.urlString}`, () => {
-                assert(firstCrawlerForTest._getInterestingFullUrlWithoutAuthAndHash(condition.in.urlString, condition.in.parentUrl, condition.in.parentTagBaseHrefValue) === condition.out);
+                assert(firstCrawlerForTest._getInterestingFullUrl(condition.in.urlString, condition.in.parentUrl, condition.in.parentTagBaseHrefValue) === condition.out);
             });
         }
     });
@@ -92,6 +92,16 @@ describe('Class Crawler', () => {
         for(let url in conditions) {
             it(`${url} without sots is ${conditions[url]}`, () => {
                 assert(firstCrawlerForTest._removeDotsInUrl(url) === conditions[url]);
+            });
+        }
+    });
+
+    describe('Method _smartDecodeUrl', () => {
+        const conditions = config['_smartDecodeUrl'];
+
+        for(let url in conditions) {
+            it(`${url} after decode is ${conditions[url]}`, () => {
+                assert(firstCrawlerForTest._smartDecodeUrl(url) === conditions[url], `Incoming: ${firstCrawlerForTest._smartDecodeUrl(url)}`);
             });
         }
     });

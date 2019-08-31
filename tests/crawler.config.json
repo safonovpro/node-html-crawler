@@ -19,7 +19,7 @@
     "viber://chat?number=+79213126942": false,
     "#garget": false
   },
-  "_getInterestingFullUrlWithoutAuthAndHash" : [
+  "_getInterestingFullUrl" : [
     {"in": {"urlString": "http://example.com/some/path?a=1&b=2#hash"}, "out": "http://example.com/some/path?a=1&b=2"},
     {"in": {"urlString": "http://username:password@example.com/some/path?a=1&b=2#hash"}, "out": "http://example.com/some/path?a=1&b=2"},
     {"in": {"urlString": "//example.com/some/path?a=1&b=2#hash", "parentUrl": "http://example.com/page.html"}, "out": "http://example.com/some/path?a=1&b=2"},
@@ -38,5 +38,10 @@
     "http://example.com/1/2/3/../../../4/5/6/../7/8/9/../.." : "http://example.com/4/5/7/",
     "http://example.com/../1/" : "http://example.com/1/",
     "http://example.com/../1" : "http://example.com/1"
+  },
+  "_smartDecodeUrl" : {
+    "https://example.com/какой-то/длинный_путь/на сайте/" : "https://example.com/%D0%BA%D0%B0%D0%BA%D0%BE%D0%B9-%D1%82%D0%BE/%D0%B4%D0%BB%D0%B8%D0%BD%D0%BD%D1%8B%D0%B9_%D0%BF%D1%83%D1%82%D1%8C/%D0%BD%D0%B0%20%D1%81%D0%B0%D0%B9%D1%82%D0%B5/",
+    "https://example.com/ещё один%20путь/" : "https://example.com/%D0%B5%D1%89%D1%91%20%D0%BE%D0%B4%D0%B8%D0%BD%20%D0%BF%D1%83%D1%82%D1%8C/",
+    "https://example.com/%D1%82%D1%80%D0%B5%D1%82%D0%B8%D0%B9%%20путь%на%acсайте/" : "https://example.com/%D1%82%D1%80%D0%B5%D1%82%D0%B8%D0%B9%%20%D0%BF%D1%83%D1%82%D1%8C%%D0%BD%D0%B0%ac%D1%81%D0%B0%D0%B9%D1%82%D0%B5/"
   }
 }

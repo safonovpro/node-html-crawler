@@ -48,7 +48,7 @@ class Crawler extends EventEmitter {
                                 });
                         } else if(/30\d/.test(result.statusCode)) {
                             const location = result.headers['location'];
-                            const nextUrl = this._getInterestingFullUrlWithoutAuthAndHash(location, currentUrl);
+                            const nextUrl = this._getInterestingFullUrl(location, currentUrl);
 
                             result.links.push({href: location, url: nextUrl});
 
@@ -74,7 +74,7 @@ class Crawler extends EventEmitter {
         }
     }
 
-    _getInterestingFullUrlWithoutAuthAndHash(urlString, parentUrl, parentTagBaseHrefValue) {
+    _getInterestingFullUrl(urlString, parentUrl, parentTagBaseHrefValue) {
         const urlObject = url.parse(urlString);
         let result = false;
 
@@ -97,6 +97,7 @@ class Crawler extends EventEmitter {
         }
 
         result = this._removeDotsInUrl(result);
+        result = this._smartDecodeUrl(result);
 
         return result;
     }
@@ -114,6 +115,21 @@ class Crawler extends EventEmitter {
         } else if(!urlObject.protocol && !urlObject.host && urlObject.path) {
             result = true;
         }
+
+        return result;
+    }
+
+    _smartDecodeUrl(url) {
+        const urlArray = url.split('/');
+        let result = '';
+
+        for(let i = 3; i < urlArray.length; i++) {
+            const partPath = urlArray[i].split('').map(val => (val === '%') ? val : encodeURI(val)).join('');
+
+            result += `/${partPath}`;
+        }
+
+        result = `${urlArray[0]}//${urlArray[2]}${result}`;
 
         return result;
     }
@@ -192,7 +208,7 @@ class Crawler extends EventEmitter {
             if(href !== undefined && result.find((value) => (value === href)) === undefined) {
                 result.push({
                     href: href,
-                    url: this._getInterestingFullUrlWithoutAuthAndHash(href, currentUrl, base)
+                    url: this._getInterestingFullUrl(href, currentUrl, base)
                 });
             }
         });
