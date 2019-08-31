@@ -217,14 +217,15 @@ class Crawler extends EventEmitter {
     }
 
     _generateEvents(eventsType, data) {
-        if(eventsType === 'data') {
-            this.countOfProcessedUrls++;
-            this.emit('data', {url: data.currentUrl, result: data.result});
+        this.countOfProcessedUrls++;
 
-            if(this.waitingOfConnection === 0 && this.countOfProcessedUrls === this.foundLinks.size) this.emit('end');
+        if(eventsType === 'data') {
+            this.emit('data', {url: data.currentUrl, result: data.result});
         } else if(eventsType === 'error') {
             this.emit('error', new Error(`Error in ${data.currentUrl}: ${data.error}`));
         }
+
+        if(this.waitingOfConnection === 0 && this.countOfProcessedUrls === this.foundLinks.size) this.emit('end');
     }
 }
 
