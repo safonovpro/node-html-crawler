@@ -119,12 +119,21 @@ describe('Class Crawler', () => {
     describe('Method _getUrlsOnHtml', () => {
         const html = fs.readFileSync(`${__dirname}/src/page-with-links.html`, 'utf-8');
         const links = firstCrawlerForTest._getUrlsOnHtml('http://example.com/some/path', html);
+        const htmlWithTagBase = fs.readFileSync(`${__dirname}/src/page-with-links-and-tag-base.html`, 'utf-8');
+        const linksWithTagBase = firstCrawlerForTest._getUrlsOnHtml('http://example.com/some/path', htmlWithTagBase);
 
         it(`Links from page ${__dirname}/src/page-with-links.html`, () => {
             assert(links.length === 3);
-            assert(links[0].href === 'https://github.com/safonovpro/node-crawler-web-pages' && links[0].url === false );
+            assert(links[0].href === 'https://github.com/safonovpro/node-html-crawler' && links[0].url === false );
             assert(links[1].href === '/other/path' && links[1].url === 'http://example.com/other/path' );
             assert(links[2].href === 'other/path' && links[2].url === 'http://example.com/some/other/path' );
+        });
+
+        it(`Links from page ${__dirname}/src/page-with-links-and-tag-base.html`, () => {
+            assert(linksWithTagBase.length === 3);
+            assert(linksWithTagBase[0].href === 'https://github.com/safonovpro/node-html-crawler' && linksWithTagBase[0].url === false );
+            assert(linksWithTagBase[1].href === '/other/path' && linksWithTagBase[1].url === 'https://example.com/other/path' );
+            assert(linksWithTagBase[2].href === 'other/path' && linksWithTagBase[2].url === 'https://example.com/other/path' );
         });
     });
 
