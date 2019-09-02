@@ -142,6 +142,7 @@ describe('Class Crawler', () => {
         const html = fs.readFileSync(`${__dirname}/src/page-with-links-and-tag-base.html`, 'utf-8');
         const tagBaseAttrs = firstCrawlerForTest._getTagAttrs('base', html);
         const tagAAttrs = firstCrawlerForTest._getTagAttrs('a', html);
+        const tagH2Attrs = firstCrawlerForTest._getTagAttrs('h2', html);
 
         it(`Check attrs tag base from page ${__dirname}/src/page-with-links-and-tag-base.html`, () => {
             assert(tagBaseAttrs.length === 1);
@@ -154,6 +155,10 @@ describe('Class Crawler', () => {
             assert(tagAAttrs[1].href === '/other/path');
             assert(tagAAttrs[2].href === 'other/path');
             assert(tagAAttrs[3].href === undefined);
+        });
+
+        it(`Check attrs tag h2 from page ${__dirname}/src/page-with-links-and-tag-base.html`, () => {
+            assert(tagH2Attrs.length === 0);
         });
     });
 
