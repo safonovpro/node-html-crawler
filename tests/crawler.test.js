@@ -125,15 +125,16 @@ describe('Class Crawler', () => {
         it(`Links from page ${__dirname}/src/page-with-links.html`, () => {
             assert(links.length === 3);
             assert(links[0].href === 'https://github.com/safonovpro/node-html-crawler' && links[0].url === false );
-            assert(links[1].href === '/other/path' && links[1].url === 'http://example.com/other/path' );
-            assert(links[2].href === 'other/path' && links[2].url === 'http://example.com/some/other/path' );
+            assert(links[1].href === '/other/path' && links[1].url === 'http://example.com/other/path');
+            assert(links[2].href === 'other/path' && links[2].url === 'http://example.com/some/other/path');
         });
 
         it(`Links from page ${__dirname}/src/page-with-links-and-tag-base.html`, () => {
             assert(linksWithTagBase.length === 3);
-            assert(linksWithTagBase[0].href === 'https://github.com/safonovpro/node-html-crawler' && linksWithTagBase[0].url === false );
-            assert(linksWithTagBase[1].href === '/other/path' && linksWithTagBase[1].url === 'https://example.com/other/path' );
-            assert(linksWithTagBase[2].href === 'other/path' && linksWithTagBase[2].url === 'https://example.com/other/path' );
+            assert(linksWithTagBase[0].href === 'https://github.com/safonovpro/node-html-crawler' && linksWithTagBase[0].url === false);
+            assert(linksWithTagBase[1].href === '/other/path' && linksWithTagBase[1].url === 'https://example.com/other/path');
+            assert(linksWithTagBase[2].href === 'other/path' && linksWithTagBase[2].url === 'https://example.com/other/path');
+            assert(linksWithTagBase[3] === undefined);
         });
     });
 
@@ -148,10 +149,11 @@ describe('Class Crawler', () => {
         });
 
         it(`Check attrs tag a from page ${__dirname}/src/page-with-links-and-tag-base.html`, () => {
-            assert(tagAAttrs.length === 3);
+            assert(tagAAttrs.length === 4);
             assert(tagAAttrs[0].href === 'https://github.com/safonovpro/node-html-crawler');
             assert(tagAAttrs[1].href === '/other/path');
             assert(tagAAttrs[2].href === 'other/path');
+            assert(tagAAttrs[3].href === undefined);
         });
     });
 
