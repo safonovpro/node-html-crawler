@@ -224,10 +224,10 @@ class Crawler extends EventEmitter {
             attrs[i] = {};
 
             foundTags[i].replace(new RegExp(`(^<${tagName}\s*|\s*\/?>$)`, 'gi'), '').trim().split(/\s+/).forEach(attr => {
-                const splitedAttr = attr.split('=');
-                const attrName = splitedAttr[0];
+                const attrName = attr.match(/^[^=]*/)[0].trim();
+                const attrValue = attr.replace(new RegExp(`^${attrName}`), '').trim().replace('=', '').replace(/(^"|"$|^'|'$)/g, '');
 
-                attrs[i][attrName] = (splitedAttr.length == 2) ? splitedAttr[1].replace(new RegExp('(^"|"$|^\'|\'$)', 'gi'), '').trim() : null;
+                attrs[i][attrName] = attrValue;
             });
         }
 

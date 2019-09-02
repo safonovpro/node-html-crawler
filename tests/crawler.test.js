@@ -133,7 +133,7 @@ describe('Class Crawler', () => {
             assert(linksWithTagBase.length === 3);
             assert(linksWithTagBase[0].href === 'https://github.com/safonovpro/node-html-crawler' && linksWithTagBase[0].url === false);
             assert(linksWithTagBase[1].href === '/other/path' && linksWithTagBase[1].url === 'https://example.com/other/path');
-            assert(linksWithTagBase[2].href === 'other/path' && linksWithTagBase[2].url === 'https://example.com/other/path');
+            assert(linksWithTagBase[2].href === 'other/path?a=1&b=2&c=3#hash' && linksWithTagBase[2].url === 'https://example.com/other/path?a=1&b=2&c=3');
             assert(linksWithTagBase[3] === undefined);
         });
     });
@@ -153,7 +153,7 @@ describe('Class Crawler', () => {
             assert(tagAAttrs.length === 4);
             assert(tagAAttrs[0].href === 'https://github.com/safonovpro/node-html-crawler');
             assert(tagAAttrs[1].href === '/other/path');
-            assert(tagAAttrs[2].href === 'other/path');
+            assert(tagAAttrs[2].href === 'other/path?a=1&b=2&c=3#hash');
             assert(tagAAttrs[3].href === undefined);
         });
 
