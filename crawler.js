@@ -216,6 +216,26 @@ class Crawler extends EventEmitter {
         return result;
     }
 
+    _getTagAttrs(tagName, html) {
+        const reg = new RegExp(`<${tagName}\s*[^>]*>`,'gi');
+        const foundTags = html.match(reg);
+        const attrs = [];
+
+        for(let i in foundTags) {
+            attrs[i] = {};
+
+            foundTags[i].replace(new RegExp(`(^<${tagName}\s*|\s*\/?>$)`, 'gi'), '').trim().split(/\s+/).forEach(attr => {
+                const splitedAttr = attr.split('=');
+                const attrName = splitedAttr[0];
+                const attrValue = splitedAttr[1].replace(new RegExp('(^"|"$|^\'|\'$)', 'gi'), '').trim();
+
+                attrs[i][attrName] = attrValue;
+            });
+        }
+
+        return attrs;
+    }
+
     _generateEvents(eventsType, data) {
         this.countOfProcessedUrls++;
 

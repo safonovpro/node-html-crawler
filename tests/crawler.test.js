@@ -137,6 +137,24 @@ describe('Class Crawler', () => {
         });
     });
 
+    describe('Method _getTagAttrs', () => {
+        const html = fs.readFileSync(`${__dirname}/src/page-with-links-and-tag-base.html`, 'utf-8');
+        const tagBaseAttrs = firstCrawlerForTest._getTagAttrs('base', html);
+        const tagAAttrs = firstCrawlerForTest._getTagAttrs('a', html);
+
+        it(`Check attrs tag base from page ${__dirname}/src/page-with-links-and-tag-base.html`, () => {
+            assert(tagBaseAttrs.length === 1);
+            assert(tagBaseAttrs[0].href === 'https://example.com/');
+        });
+
+        it(`Check attrs tag a from page ${__dirname}/src/page-with-links-and-tag-base.html`, () => {
+            assert(tagAAttrs.length === 3);
+            assert(tagAAttrs[0].href === 'https://github.com/safonovpro/node-html-crawler');
+            assert(tagAAttrs[1].href === '/other/path');
+            assert(tagAAttrs[2].href === 'other/path');
+        });
+    });
+
     describe('Method _generateEvents', () => {
         const countOfLinks = 3;
         let results = [];
