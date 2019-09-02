@@ -3,7 +3,6 @@ const http = require('http');
 const https = require('https');
 const url = require('url');
 const punycode = require('punycode');
-const cheerio = require('cheerio');
 
 class Crawler extends EventEmitter {
     constructor(config) {
@@ -198,12 +197,12 @@ class Crawler extends EventEmitter {
     }
 
     _getUrlsOnHtml(currentUrl, html) {
-        const $ = cheerio.load(html);
-        const base = ($('base[href]').length > 0) ? $('base').attr('href').replace(/\/+$/, '') + '/' : undefined;
+        const baseAttrs = this._getTagAttrs('base', html);
+        const base = (baseAttrs.length > 0) ? baseAttrs[0].href.replace(/\/+$/, '') + '/' : undefined;
         const result = [];
 
-        $('a').each((index, element) => {
-            const href = $(element).attr('href');
+        this._getTagAttrs('a', html).forEach(val => {
+            const href = val.href;
 
             if(href !== undefined && result.find((value) => (value === href)) === undefined) {
                 result.push({
