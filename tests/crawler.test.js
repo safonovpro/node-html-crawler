@@ -138,27 +138,27 @@ describe('Class Crawler', () => {
         });
     });
 
-    describe('Method _getTagAttrs', () => {
+    describe('Method _getTagsHref', () => {
         const html = fs.readFileSync(`${__dirname}/src/page-with-links-and-tag-base.html`, 'utf-8');
-        const tagBaseAttrs = firstCrawlerForTest._getTagAttrs('base', html);
-        const tagAAttrs = firstCrawlerForTest._getTagAttrs('a', html);
-        const tagH2Attrs = firstCrawlerForTest._getTagAttrs('h2', html);
+        const baseHref = firstCrawlerForTest._getTagsHref('base', html);
+        const aHrefs = firstCrawlerForTest._getTagsHref('a', html);
+        const h2Hrefs = firstCrawlerForTest._getTagsHref('h2', html);
 
-        it(`Check attrs tag base from page ${__dirname}/src/page-with-links-and-tag-base.html`, () => {
-            assert(tagBaseAttrs.length === 1);
-            assert(tagBaseAttrs[0].href === 'https://example.com/');
+        it(`Check href of tag base from page ${__dirname}/src/page-with-links-and-tag-base.html`, () => {
+            assert(baseHref.length === 1);
+            assert(baseHref[0] === 'https://example.com/');
         });
 
-        it(`Check attrs tag a from page ${__dirname}/src/page-with-links-and-tag-base.html`, () => {
-            assert(tagAAttrs.length === 4);
-            assert(tagAAttrs[0].href === 'https://github.com/safonovpro/node-html-crawler');
-            assert(tagAAttrs[1].href === '/other/path');
-            assert(tagAAttrs[2].href === 'other/path?a=1&b=2&c=3#hash');
-            assert(tagAAttrs[3].href === undefined);
+        it(`Check href of tags a from page ${__dirname}/src/page-with-links-and-tag-base.html`, () => {
+            assert(aHrefs.length === 3);
+            assert(aHrefs[0] === 'https://github.com/safonovpro/node-html-crawler');
+            assert(aHrefs[1] === '/other/path');
+            assert(aHrefs[2] === 'other/path?a=1&b=2&c=3#hash');
+            assert(aHrefs[3] === undefined);
         });
 
         it(`Check attrs tag h2 from page ${__dirname}/src/page-with-links-and-tag-base.html`, () => {
-            assert(tagH2Attrs.length === 0);
+            assert(h2Hrefs.length === 0);
         });
     });
 

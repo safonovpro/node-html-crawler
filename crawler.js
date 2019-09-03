@@ -197,14 +197,11 @@ class Crawler extends EventEmitter {
     }
 
     _getUrlsOnHtml(currentUrl, html) {
-        const baseAttrs = this._getTagAttrs('base', html);
-        const base = (baseAttrs.length > 0) ? baseAttrs[0].href.replace(/\/+$/, '') + '/' : undefined;
+        const base = this._getTagsHref('base', html)[0];
         const result = [];
 
-        this._getTagAttrs('a', html).forEach(val => {
-            const href = val.href;
-
-            if(href !== undefined && result.find((value) => (value === href)) === undefined) {
+        this._getTagsHref('a', html).forEach(href => {
+            if(result.find(value => value === href) === undefined) {
                 result.push({
                     href: href,
                     url: this._getInterestingFullUrl(href, currentUrl, base)
@@ -215,23 +212,32 @@ class Crawler extends EventEmitter {
         return result;
     }
 
-    _getTagAttrs(tagName, html) {
+    _getTagsHref(tagName, html) {
         const reg = new RegExp(`<${tagName}\s*[^>]*>`,'gi');
         const foundTags = html.match(reg);
-        const attrs = [];
+        const hrefs = [];
 
         for(let i in foundTags) {
-            attrs[i] = {};
+            let strWithTagAttrs = foundTags[i].replace(new RegExp(`(^<${tagName}\s*|\s*\/?>$)`, 'gi'), '').trim();
+            let hrefPosition = strWithTagAttrs.search(/(\s|^)href=/);
 
-            foundTags[i].replace(new RegExp(`(^<${tagName}\s*|\s*\/?>$)`, 'gi'), '').trim().split(/\s+/).forEach(attr => {
-                const attrName = attr.match(/^[^=]*/)[0].trim();
-                const attrValue = attr.replace(new RegExp(`^${attrName}`), '').trim().replace('=', '').replace(/(^"|"$|^'|'$)/g, '');
+            if(~hrefPosition) {
+                let commas = false;
+                let endCharacter = /(\s|$)/;
 
-                attrs[i][attrName] = attrValue;
-            });
+                strWithTagAttrs = (hrefPosition) ? strWithTagAttrs.slice(hrefPosition + 6) : strWithTagAttrs.slice(hrefPosition + 5);
+
+                if(/('|")/.test(strWithTagAttrs[0])) {
+                    commas = strWithTagAttrs[0];
+                    endCharacter = commas;
+                    strWithTagAttrs = strWithTagAttrs.slice(1);                    
+                }
+
+                hrefs.push(strWithTagAttrs.slice(0, strWithTagAttrs.search(endCharacter)));
+            }
         }
 
-        return attrs;
+        return hrefs;
     }
 
     _generateEvents(eventsType, data) {
