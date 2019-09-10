@@ -28,19 +28,19 @@ Install with npm:
 Include module in script:
 
 ```js
-const Crawler = require('node-crawler');
+const Crawler = require('node-html-crawler');
 ```
 
 Create instance of a class `Crawler` by passing the domain name:
 
 ```js
-const crawler = Crawler('example.com');
+const crawler = new Crawler('example.com');
 ```
 
 Or with more advanced settings:
 
 ```js
-const crawler = Crawler({
+const crawler = new Crawler({
     protocol: 'https:', // default 'http:'
     domain: 'safonov.pro', // default 'example.com'
     limitForConnections: 15, // number of simultaneous connections, default 10
