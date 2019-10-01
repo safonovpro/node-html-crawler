@@ -14,6 +14,7 @@ class Crawler extends EventEmitter {
       limitForConnections: 10,
       limitForRedirects: 3,
       timeout: 100,
+      headers: { 'User-Agent': 'Mozilla/5.0' },
     };
 
     if (typeof config === 'string') {
@@ -166,7 +167,7 @@ class Crawler extends EventEmitter {
       port: (urlObject.port) ? urlObject.port : 80,
       path: urlObject.path,
       method,
-      headers: { 'User-Agent': 'Mozilla/5.0' },
+      headers: this.config.headers,
     };
     let reqModule = http;
 

@@ -15,6 +15,11 @@ describe('Constructor', () => {
     limitForConnections: 30,
     limitForRedirects: 5,
     timeout: 500,
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (compatible; YandexAccessibilityBot/3.0; +http://yandex.com/bots)',
+      // eslint-disable-next-line quote-props
+      'Cookie': 'name=value',
+    },
   };
   const thirdCrawlerForTest = new Crawler(settingsForThirdCrawler);
 
@@ -28,6 +33,7 @@ describe('Constructor', () => {
       limitForRedirects: 3,
       startUrl: `${protocol}//${domainInPunycode}/`,
       timeout: 100,
+      headers: { 'User-Agent': 'Mozilla/5.0' },
     });
   });
 
