@@ -223,7 +223,7 @@ class Crawler extends EventEmitter {
   }
 
   static getTagsHref(tagName, html) {
-    const htmlWithoutComments = html.replace(/<!--(?:(?!-->).)*-->/gs, '');
+    const htmlWithoutComments = html.replace(/<!--(?:(?!-->)[\s\S])*-->/g, '');
     const reg = new RegExp(`<${tagName}\\s*[^>]*>`, 'gi');
     const foundTags = htmlWithoutComments.match(reg) || [];
     const hrefs = [];
