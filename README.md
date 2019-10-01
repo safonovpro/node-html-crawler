@@ -102,8 +102,8 @@ const domain = process.argv[2];
 const crawler = new Crawler(domain);
 
 crawler.crawl();
-crawler.on('data', data => console.log(data.result.statusCode, data.url));
-crawler.on('error', error => console.error(error));
+crawler.on('data', (data) => console.log(data.result.statusCode, data.url));
+crawler.on('error', (error) => console.error(error));
 crawler.on('end', () => console.log(`Finish! All urls on domain ${domain} a crawled!`));
 ```
 
@@ -118,54 +118,54 @@ const fs = require('fs');
 const Crawler = require('../crawler');
 
 const domain = process.argv[2];
-const crawler = new Crawler(domain);
-const siteTree = {pages: [], urls: {}, redirects: {}};
+const crawler = new Crawler({
+  domain,
+  timeout: 500,
+});
+const siteTree = { pages: [], urls: {}, redirects: {} };
+const getFinalStatusCodeOfRedirects = (url) => {
+  if (/30\d/.test(siteTree.urls[url])) return getFinalStatusCodeOfRedirects(siteTree.redirects[url]);
+
+  return siteTree.urls[url];
+};
 
 crawler.crawl();
-crawler.on('data', data => {
-    siteTree.urls[data.url] = data.result.statusCode;
-    siteTree.pages.push({
-        url: data.url,
-        links: data.result.links
-    });
+crawler.on('data', (data) => {
+  siteTree.urls[data.url] = data.result.statusCode;
+  siteTree.pages.push({
+    url: data.url,
+    links: data.result.links,
+  });
 
-    process.stdout.write(`\r${crawler.countOfProcessedUrls} out of ${crawler.foundLinks.size}`);
+  process.stdout.write(`\r${crawler.countOfProcessedUrls} out of ${crawler.foundLinks.size}`);
 
-    if(/30\d/.test(data.result.statusCode) && data.result.links[0].url) siteTree.redirects[data.url] = data.result.links[0].url;
+  if (/30\d/.test(data.result.statusCode) && data.result.links[0].url) siteTree.redirects[data.url] = data.result.links[0].url;
 });
-crawler.on('error', error => console.error(error));
+crawler.on('error', (error) => console.error(error));
 crawler.on('end', () => {
-    const resultFilePath = `${__dirname}/${domain}.csv`;
+  const resultFilePath = `${__dirname}/${domain}.csv`;
 
-    fs.writeFileSync(resultFilePath, 'url;href;status\r\n');
+  fs.writeFileSync(resultFilePath, 'url;href;status\r\n');
 
-    for(let pageIndex in siteTree.pages) {
-        const urlOfPage = siteTree.pages[pageIndex].url;
+  siteTree.pages.forEach((page, pageIndex) => {
+    const urlOfPage = siteTree.pages[pageIndex].url;
 
-        for(let linkIndex in siteTree.pages[pageIndex].links) {
-            const urlOfLink = siteTree.pages[pageIndex].links[linkIndex].url;
+    siteTree.pages[pageIndex].links.forEach((link, linkIndex) => {
+      const urlOfLink = siteTree.pages[pageIndex].links[linkIndex].url;
 
-            if(urlOfLink) {
-                const hrefOfLink = siteTree.pages[pageIndex].links[linkIndex].href;
-                const statusCodeOfLink = (/30\d/.test(siteTree.urls[urlOfLink])) ? getFinalStatusCodeOfRedirects(urlOfLink) : siteTree.urls[urlOfLink];
+      if (urlOfLink) {
+        const hrefOfLink = siteTree.pages[pageIndex].links[linkIndex].href;
+        const statusCodeOfLink = (/30\d/.test(siteTree.urls[urlOfLink])) ? getFinalStatusCodeOfRedirects(urlOfLink) : siteTree.urls[urlOfLink];
 
-                if(statusCodeOfLink) {
-                    fs.appendFileSync(resultFilePath, `${urlOfPage};${hrefOfLink};${statusCodeOfLink}\r\n`);
-                }
-            }
+        if (statusCodeOfLink) {
+          fs.appendFileSync(resultFilePath, `"${urlOfPage}";"${hrefOfLink}";"${statusCodeOfLink}"\r\n`);
         }
-    }
+      }
+    });
+  });
 
-    console.log(`\r\nFinish! All ${crawler.foundLinks.size} links on pages on domain ${domain} a checked!`);
+  console.log(`\r\nFinish! All ${crawler.foundLinks.size} links on pages on domain ${domain} a checked!`);
 });
-
-function getFinalStatusCodeOfRedirects(url) {
-    if(/30\d/.test(siteTree.urls[url])) {
-        return getFinalStatusCodeOfRedirects(siteTree.redirects[url]);
-    } else {
-        return siteTree.urls[url];
-    }
-}
 ```
 
 ### Download all html-pages from site
@@ -180,36 +180,39 @@ const url = require('url');
 const Crawler = require('../crawler');
 
 const domain = process.argv[2];
-const crawler = new Crawler(domain);
+const crawler = new Crawler({
+  domain,
+  timeout: 500,
+});
 
 crawler.crawl();
-crawler.on('data', data => save(data.url, data.result.body));
-crawler.on('error', error => console.error(error));
-crawler.on('end', () => console.log(`All pages a saved in folder ${__dirname}/${config.domain}!`));
+crawler.on('data', (data) => {
+  if (!data.url || !data.result.body) return false;
 
-function save(urlString, html) {
-    if(!urlString || !html) return false;
+  const urlString = data.url;
+  const html = data.result.body;
+  const urlObject = url.parse(urlString);
+  const pathArray = urlObject.pathname.split('/');
+  let path = `${__dirname}/${domain}`;
 
-    const urlObject = url.parse(urlString);
-    const pathArray = urlObject.pathname.split('/');
-    let path = `${__dirname}/${config.domain}`;
+  if (!fs.existsSync(path)) fs.mkdirSync(path);
 
-    if(!fs.existsSync(path)) fs.mkdirSync(path);
+  for (let i = 1; i < pathArray.length; i += 1) {
+    if (i !== pathArray.length - 1) {
+      path = `${path}/${pathArray[i]}`;
 
-    for(let i = 1; i < pathArray.length; i++) {
-         if(i !== pathArray.length - 1) {
-             path = `${path}/${pathArray[i]}`;
+      if (!fs.existsSync(path)) fs.mkdirSync(path);
+    } else {
+      path = (pathArray[i]) ? `${path}/${pathArray[i].replace(/\.html?$/, '')}` : `${path}/index`;
+      path = (urlObject.query) ? `${path}-${urlObject.query}.html` : `${path}.html`;
 
-             if(!fs.existsSync(path)) fs.mkdirSync(path);
-         } else {
-             path = (pathArray[i]) ? `${path}/${pathArray[i].replace(/\.html?$/,'')}`: `${path}/index`;
-             path = (urlObject.query) ? `${path}-${urlObject.query}.html` : `${path}.html`;
-
-             fs.writeFileSync(path, html);
-             console.log('saved', urlString);
-         }
+      fs.writeFileSync(path, html);
+      console.log('saved', urlString);
     }
+  }
 
-    return true;
-}
+  return true;
+});
+crawler.on('error', (error) => console.error(error));
+crawler.on('end', () => console.log(`All pages a saved in folder ${__dirname}/${domain}!`));
 ```
