@@ -44,7 +44,7 @@ const crawler = new Crawler({
     protocol: 'https:', // default 'http:'
     domain: 'safonov.pro', // default 'example.com'
     limitForConnections: 15, // number of simultaneous connections, default 10
-    limitForRedirects: 5, // possible number of redirects, default 3
+    limitForRedirects: 5, // possible number of redirects, default 5
     timeout: 500, // number of milliseconds between pending connection, default 300
     headers: {
       'User-Agent': 'Mozilla/5.0', // default header
