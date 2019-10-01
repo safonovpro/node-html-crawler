@@ -13,7 +13,7 @@ class Crawler extends EventEmitter {
       domain: 'example.com',
       limitForConnections: 10,
       limitForRedirects: 3,
-      timeout: 100,
+      timeout: 300,
       headers: { 'User-Agent': 'Mozilla/5.0' },
     };
 

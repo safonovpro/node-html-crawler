@@ -32,7 +32,7 @@ describe('Constructor', () => {
       limitForConnections: 10,
       limitForRedirects: 3,
       startUrl: `${protocol}//${domainInPunycode}/`,
-      timeout: 100,
+      timeout: 300,
       headers: { 'User-Agent': 'Mozilla/5.0' },
     });
   });
