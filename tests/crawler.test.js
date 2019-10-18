@@ -60,7 +60,7 @@ describe('Method getDataByUrl', () => {
         assert.isNotEmpty(result.body);
         assert.isArray(result.links);
         assert.lengthOf(result.links, 1);
-        assert.strictEqual(result.links[0].href, 'http://www.iana.org/domains/example');
+        assert.strictEqual(result.links[0].href, 'https://www.iana.org/domains/example');
       }));
   });
 
