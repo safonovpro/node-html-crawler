@@ -1,138 +1,203 @@
-const fs =      require('fs');
-const assert =  require('chai').assert;
-const config =  require('./crawler.config');
+const fs = require('fs');
+const { assert } = require('chai');
+const config = require('./crawler.config');
 const Crawler = require('../crawler');
 
 const firstCrawlerForTest = new Crawler();
 
-describe('Class Crawler', () => {
-    describe('Method constructor', () => {
-        const domain = 'safonov.pro';
-        const secondCrawlerForTest = new Crawler(domain);
-        const settingsForTherdCrawler = {
-            protocol: 'https:',
-            domain: 'safonov.pro',
-            limitForConnections: 30,
-            limitForRedirects: 5,
-            timeout: 500
-        };
-        const thirdCrawlerForTest = new Crawler(settingsForTherdCrawler);
+describe('Constructor', () => {
+  const domain = 'сафонов.pro';
+  const domainInPunycode = 'xn--80ae6adbow.pro';
+  const secondCrawlerForTest = new Crawler(domain);
+  const settingsForThirdCrawler = {
+    protocol: 'https:',
+    domain,
+    limitForConnections: 30,
+    limitForRedirects: 5,
+    timeout: 500,
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (compatible; YandexAccessibilityBot/3.0; +http://yandex.com/bots)',
+      // eslint-disable-next-line quote-props
+      'Cookie': 'name=value',
+    },
+  };
+  const thirdCrawlerForTest = new Crawler(settingsForThirdCrawler);
 
-        it('Set domain by string, other setting by default', () => {
-            assert(secondCrawlerForTest.config.domain === domain);
-            // Default settings
-            assert(secondCrawlerForTest.config.protocol === 'http:');
-            assert(secondCrawlerForTest.config.limitForConnections === 10);
-            assert(secondCrawlerForTest.config.limitForRedirects === 3);
-            assert(secondCrawlerForTest.config.timeout === 100);
-        });
+  it('Set domain by string and other setting by default', () => {
+    const protocol = 'http:';
 
-        it('Costume settings', () => {
-            assert(thirdCrawlerForTest.config.protocol === settingsForTherdCrawler.protocol);
-            assert(thirdCrawlerForTest.config.domain === settingsForTherdCrawler.domain);
-            assert(thirdCrawlerForTest.config.limitForConnections === settingsForTherdCrawler.limitForConnections);
-            assert(thirdCrawlerForTest.config.limitForRedirects === settingsForTherdCrawler.limitForRedirects);
-            assert(thirdCrawlerForTest.config.timeout === settingsForTherdCrawler.timeout);
-        });
+    assert.deepEqual(secondCrawlerForTest.config, {
+      domain: domainInPunycode,
+      protocol,
+      limitForConnections: 10,
+      limitForRedirects: 5,
+      startUrl: `${protocol}//${domainInPunycode}/`,
+      timeout: 300,
+      headers: { 'User-Agent': 'Mozilla/5.0' },
     });
+  });
 
-    describe('Method _getDataByURL', () => {
-        for(let protocol of ['http', 'https']) {
-            const url = `${protocol}://example.com/`;
-
-            it(`Method GET, URL is ${url}`, () => {
-                return firstCrawlerForTest._getDataByUrl(url, 'GET')
-                    .then(result => {
-                        assert(typeof result.requestMethod === 'string' && result.requestMethod === 'GET');
-                        assert(typeof result.statusCode === 'number' && result.statusCode === 200);
-                        assert(typeof result.headers === 'object' && /^text\/html/.test(result.headers['content-type']));
-                        assert(typeof result.body === 'string' && result.body.length > 0);
-                        assert(typeof result.links === 'object' && result.links.length === 1 && result.links[0].href === 'http://www.iana.org/domains/example');
-                    });
-            });
-        }
-
-        it(`Method HEAD, URL is http://yandex.ru/`, () => {
-            return firstCrawlerForTest._getDataByUrl('http://yandex.ru/')
-                .then(result => {
-                    assert(typeof result.requestMethod === 'string' && result.requestMethod === 'HEAD');
-                    assert(typeof result.statusCode === 'number' && /30\d/.test(result.statusCode));
-                    assert(typeof result.headers === 'object' && result.headers['location'] === 'https://yandex.ru/');
-                    assert(typeof result.body === 'string' && result.body.length === 0);
-                });
-        });
+  it('Costume settings', () => {
+    assert.deepEqual(thirdCrawlerForTest.config, {
+      ...settingsForThirdCrawler,
+      domain: domainInPunycode,
+      startUrl: `${settingsForThirdCrawler.protocol}//${domainInPunycode}/`,
     });
+  });
+});
 
-    describe('Method _getInterestingFullUrlWithoutAuthAndHash', () => {
-        const conditions = config['_getInterestingFullUrlWithoutAuthAndHash'];
+describe('Method getDataByUrl', () => {
+  ['http', 'https'].forEach((protocol) => {
+    const url = `${protocol}://example.com/`;
 
-        for(let condition of conditions) {
-            it(`Full url from ${condition.in.urlString}`, () => {
-                assert(firstCrawlerForTest._getInterestingFullUrlWithoutAuthAndHash(condition.in.urlString, condition.in.parentUrl, condition.in.parentTagBaseHrefValue) === condition.out);
-            });
-        }
+    it(`Method GET, URL is ${url}`, () => firstCrawlerForTest.getDataByUrl(url, 'GET')
+      .then((result) => {
+        assert.strictEqual(result.requestMethod, 'GET');
+        assert.strictEqual(result.statusCode, 200);
+        assert.isObject(result.headers);
+        assert.match(result.headers['content-type'], /^text\/html/);
+        assert.isString(result.body);
+        assert.isNotEmpty(result.body);
+        assert.isArray(result.links);
+        assert.lengthOf(result.links, 1);
+        assert.strictEqual(result.links[0].href, 'https://www.iana.org/domains/example');
+      }));
+  });
+
+  it('Method HEAD, URL is http://yandex.ru/', () => firstCrawlerForTest.getDataByUrl('http://yandex.ru/')
+    .then((result) => {
+      assert.strictEqual(result.requestMethod, 'HEAD');
+      assert.isNumber(result.statusCode);
+      assert.strictEqual(result.statusCode.toString().slice(0, 2), '30');
+      assert.isObject(result.headers);
+      assert.strictEqual(result.headers.location, 'https://yandex.ru/');
+      assert.isString(result.body);
+      assert.isEmpty(result.body);
+    }));
+});
+
+describe('Method getInterestingFullUrl', () => {
+  const conditions = config.getInterestingFullUrl;
+
+  conditions.forEach((condition) => {
+    it(`Full url from ${condition.in.urlString}`, () => {
+      const data = [
+        condition.in.urlString,
+        condition.in.parentUrl,
+        condition.in.parentTagBaseHrefValue,
+      ];
+
+      assert.strictEqual(firstCrawlerForTest.getInterestingFullUrl(...data), condition.out);
     });
+  });
+});
 
-    describe('Method _isInterestingUrl', () => {
-        const conditions = config['_isInterestingUrl'];
+describe('Method isInterestingUrl', () => {
+  const conditions = config.isInterestingUrl;
 
-        for(let url in conditions) {
-            if(conditions.hasOwnProperty(url)) {
-                it(`${url} an internal and not only hash?`, () => {
-                    assert(firstCrawlerForTest._isInterestingUrl(url) === conditions[url]);
-                });
-            }
-        }
+  Object.entries(conditions).forEach(([url, isInteresting]) => {
+    it(`${url} an internal and not only hash?`, () => {
+      assert.strictEqual(firstCrawlerForTest.isInterestingUrl(url), isInteresting);
     });
+  });
+});
 
-    describe('Method _removeDotsInUrl', () => {
-        const conditions = config['_removeDotsInUrl'];
+describe('Method removeDotsInUrl', () => {
+  const conditions = config.removeDotsInUrl;
 
-        for(let url in conditions) {
-            it(`${url} without sots is ${conditions[url]}`, () => {
-                assert(firstCrawlerForTest._removeDotsInUrl(url) === conditions[url]);
-            });
-        }
+  Object.entries(conditions).forEach(([url, urlAfterRemovedDots]) => {
+    it(`${url} without sots is ${conditions[url]}`, () => {
+      assert.strictEqual(Crawler.removeDotsInUrl(url), urlAfterRemovedDots);
     });
+  });
+});
 
-    describe('Method _getUrlsOnHtml', () => {
-        const html = fs.readFileSync(`${__dirname}/src/page-with-links.html`, 'utf-8');
-        const links = firstCrawlerForTest._getUrlsOnHtml('http://example.com/some/path', html);
+describe('Method smartDecodeUrl', () => {
+  const conditions = config.smartDecodeUrl;
 
-        it(`Links from page ${__dirname}/src/page-with-links.html`, () => {
-            assert(links.length === 3);
-            assert(links[0].href === 'https://github.com/safonovpro/node-crawler-web-pages' && links[0].url === false );
-            assert(links[1].href === '/other/path' && links[1].url === 'http://example.com/other/path' );
-            assert(links[2].href === 'other/path' && links[2].url === 'http://example.com/some/other/path' );
-        });
+  Object.entries(conditions).forEach(([url, urlAfterDecode]) => {
+    it(`${url} after decode is ${conditions[url]}`, () => {
+      assert.strictEqual(Crawler.smartDecodeUrl(url), urlAfterDecode);
     });
+  });
+});
 
-    describe('Method _generateEvents', () => {
-        const countOfLinks = 3;
-        let results = [];
-        let isEnded = false;
+describe('Method getUrlsOnHtml', () => {
+  const html = fs.readFileSync(`${__dirname}/src/page-with-links.html`, 'utf-8');
+  const links = firstCrawlerForTest.getUrlsOnHtml('http://example.com/some/path', html);
+  const htmlWithTagBase = fs.readFileSync(`${__dirname}/src/page-with-links-and-tag-base.html`, 'utf-8');
+  const linksWithTagBase = firstCrawlerForTest.getUrlsOnHtml('http://example.com/some/path', htmlWithTagBase);
 
-        for (let i = 0; i < countOfLinks; i++) {
-            firstCrawlerForTest.foundLinks.add(`link-${i}`);
-        }
+  it(`Links from page ${__dirname}/src/page-with-links.html`, () => {
+    assert.lengthOf(links, 3);
+    assert.deepEqual(links, [
+      { href: 'https://github.com/safonovpro/node-html-crawler', url: false },
+      { href: '/other/path', url: 'http://example.com/other/path' },
+      { href: 'other/path', url: 'http://example.com/some/other/path' },
+    ]);
+  });
 
-        firstCrawlerForTest.on('data', data => results.push(data));
-        firstCrawlerForTest.on('end', () => isEnded = true);
+  it(`Links from page ${__dirname}/src/page-with-links-and-tag-base.html`, () => {
+    assert.lengthOf(linksWithTagBase, 3);
+    assert.deepEqual(linksWithTagBase, [
+      { href: 'https://github.com/safonovpro/node-html-crawler', url: false },
+      { href: '/other/path', url: 'https://example.com/other/path' },
+      { href: 'other/path?a=1&b=2&c=3#hash', url: 'https://example.com/other/path?a=1&b=2&c=3' },
+    ]);
+  });
+});
 
-        for (let i = 0; i < countOfLinks; i++) {
-            firstCrawlerForTest._generateEvents('data', {currentUrl: `current-url-${i}`, result: `result-${i}`});
-        }
+describe('Method getTagsHref', () => {
+  const html = fs.readFileSync(`${__dirname}/src/page-with-links-and-tag-base.html`, 'utf-8');
+  const baseHref = Crawler.getTagsHref('base', html);
+  const aHrefs = Crawler.getTagsHref('a', html);
+  const h2Hrefs = Crawler.getTagsHref('h2', html);
 
-        it('Events "data"', () => {
-            assert(results.length === countOfLinks);
+  it(`Check href of tag base from page ${__dirname}/src/page-with-links-and-tag-base.html`, () => {
+    assert.lengthOf(baseHref, 1);
+    assert.deepEqual(baseHref, ['https://example.com/']);
+  });
 
-            for(let i = 0; i < countOfLinks; i++) {
-                assert(results[i].url === `current-url-${i}` && results[i].result === `result-${i}`);
-            }
-        });
+  it(`Check href of tags a from page ${__dirname}/src/page-with-links-and-tag-base.html`, () => {
+    assert.lengthOf(aHrefs, 3);
+    assert.deepEqual(aHrefs, [
+      'https://github.com/safonovpro/node-html-crawler',
+      '/other/path',
+      'other/path?a=1&b=2&c=3#hash',
+    ]);
+  });
 
-        it('Events "end"', () => {
-            assert(isEnded);
-        });
-    });
+  it(`Check attrs tag h2 from page ${__dirname}/src/page-with-links-and-tag-base.html`, () => {
+    assert.isEmpty(h2Hrefs);
+  });
+});
+
+describe('Method generateEvents', () => {
+  const countOfLinks = 3;
+  const results = [];
+  let isEnded = false;
+
+  for (let i = 0; i < countOfLinks; i += 1) {
+    firstCrawlerForTest.foundLinks.add(`link-${i}`);
+  }
+
+  firstCrawlerForTest.on('data', (data) => results.push(data));
+  firstCrawlerForTest.on('end', () => { isEnded = true; });
+
+  for (let i = 0; i < countOfLinks; i += 1) {
+    firstCrawlerForTest.generateEvents('data', { currentUrl: `current-url-${i}`, result: `result-${i}` });
+  }
+
+  it('Events "data"', () => {
+    assert.strictEqual(results.length, countOfLinks);
+
+    for (let i = 0; i < countOfLinks; i += 1) {
+      assert.strictEqual(results[i].url, `current-url-${i}`);
+      assert.strictEqual(results[i].result, `result-${i}`);
+    }
+  });
+
+  it('Events "end"', () => {
+    assert.isTrue(isEnded);
+  });
 });
