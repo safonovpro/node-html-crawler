@@ -26,10 +26,10 @@
   },
   "homepage": "https://github.com/safonovpro/node-html-crawler#readme",
   "devDependencies": {
-    "chai": "^4.1.2",
-    "eslint": "^6.3.0",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-plugin-import": "^2.18.2",
+    "chai": "^4.2.0",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-import": "^2.20.2",
     "mocha": "^5.2.0"
   },
   "dependencies": {}
