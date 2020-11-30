@@ -7,6 +7,5 @@ Provides a very simple event interface using `EventEmitter`.
 
 
 ## Instruction
-Run with node
-`node application.js domain.com` 
+Run with `node application.js domain.com` 
 
