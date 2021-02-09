@@ -50,6 +50,7 @@ const crawler = new Crawler({
       'User-Agent': 'Mozilla/5.0', // default header
       'Cookie': 'name=value', // advanced header
     },
+    urlFilter: (url) => true, // default filter
 });
 ```
 
@@ -86,6 +87,12 @@ Event `data` returns the following data:
     }
 }
 ```
+
+### Using the `urlFilter` option
+
+Sometimes you want more control over which pages are crawled. Maybe you only want to skip pages that match a pattern, or some similar type of thing. For these situations you can use the `urlFilter` option to supply a filter function.
+
+The `urlFilter` option should be a function which accepts a single argument which is the URL being considered for crawling. This function's prime objective is for _exclusion_, not inclusion. If your function returns a falsey value, then the URL will be skipped even if it otherwise would have been included.
 
 ## Examples
 
