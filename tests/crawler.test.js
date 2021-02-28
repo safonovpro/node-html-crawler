@@ -20,13 +20,14 @@ describe('Constructor', () => {
       // eslint-disable-next-line quote-props
       'Cookie': 'name=value',
     },
+    urlFilter: () => true,
   };
   const thirdCrawlerForTest = new Crawler(settingsForThirdCrawler);
 
   it('Set domain by string and other setting by default', () => {
     const protocol = 'http:';
 
-    assert.deepEqual(secondCrawlerForTest.config, {
+    assert.deepEqual(Object.assign(secondCrawlerForTest.config, { urlFilter: 1 }), {
       domain: domainInPunycode,
       protocol,
       limitForConnections: 10,
@@ -34,6 +35,7 @@ describe('Constructor', () => {
       startUrl: `${protocol}//${domainInPunycode}/`,
       timeout: 300,
       headers: { 'User-Agent': 'Mozilla/5.0' },
+      urlFilter: 1,
     });
   });
 
@@ -98,6 +100,18 @@ describe('Method isInterestingUrl', () => {
   Object.entries(conditions).forEach(([url, isInteresting]) => {
     it(`${url} an internal and not only hash?`, () => {
       assert.strictEqual(firstCrawlerForTest.isInterestingUrl(url), isInteresting);
+    });
+  });
+});
+
+describe('Method isInterestingUrl with urlFilter enabled', () => {
+  const filteredCrawler = new Crawler({ urlFilter: (value) => !!value.match(/www/, 'i') });
+
+  const conditions = config.isInterestingUrlWithFilter;
+
+  Object.entries(conditions).forEach(([url, isInteresting]) => {
+    it(`${url} an internal and not only hash and not filtered?`, () => {
+      assert.strictEqual(filteredCrawler.isInterestingUrl(url), isInteresting);
     });
   });
 });
