@@ -216,7 +216,7 @@ class Crawler extends EventEmitter {
     const result = [];
 
     Crawler.getTagsHref('a', html).forEach((href) => {
-      if (result.find((value) => value === href) === undefined) {
+      if (result.find((value) => value.href === href) === undefined) {
         result.push({
           href,
           url: this.getInterestingFullUrl(href, currentUrl, base),
