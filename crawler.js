@@ -43,9 +43,21 @@ class Crawler extends EventEmitter {
 
         this.getDataByUrl(currentUrl)
           .then((headers) => {
+            
+            /*
+            this.getDataByUrl(currentUrl, 'GET')
+              .then((result) => {
+                console.log(result);
+              }).catch((error) => {
+                this.generateEvents('error', { currentUrl, error });
+              });
+             */
+
             if (headers.statusCode === 200 && /^text\/html/.test(headers.headers['content-type'])) {
               this.getDataByUrl(currentUrl, 'GET')
                 .then((result) => {
+                
+                  //console.log(result);
                   result.links.forEach((link) => { if (link.url) this.crawl(link.url); });
 
                   this.generateEvents('data', { currentUrl, result });
@@ -118,7 +130,8 @@ class Crawler extends EventEmitter {
           result = true;
         }
       }
-    } else if (!urlObject.protocol && !urlObject.host && urlObject.path) {
+    }
+     else if (!urlObject.protocol && !urlObject.host && urlObject.path) {
       result = true;
     }
 
@@ -140,6 +153,7 @@ class Crawler extends EventEmitter {
     return result;
   }
 
+  /* Go back to parent directory like in Linux bash. */
   static removeDotsInUrl(urlWithDots) {
     const urlArray = urlWithDots.split('/');
     let countOfDotted = 0;
@@ -187,6 +201,11 @@ class Crawler extends EventEmitter {
         response.on('end', () => {
           this.countOfConnections -= 1;
 
+        /*
+        if (/^text\/html/.test(response.headers['content-type']))
+          console.log("urls will be searched");
+        */
+
           resolve({
             requestMethod: method,
             statusCode: response.statusCode,
@@ -207,17 +226,30 @@ class Crawler extends EventEmitter {
   }
 
   getUrlsOnHtml(currentUrl, html) {
+
+    /* Calling Crawler.getTagsHref() with 'base' always returns null. */
     const base = Crawler.getTagsHref('base', html)[0];
     const result = [];
 
     Crawler.getTagsHref('a', html).forEach((href) => {
-      if (result.find((value) => value === href) === undefined) {
+      
+      /*
+      console.log('href looks like: ');
+      console.log(href);
+      */
+
+      if (result.find((value) => value.href === href) === undefined) {
         result.push({
           href,
           url: this.getInterestingFullUrl(href, currentUrl, base),
         });
       }
     });
+    
+    /*
+    console.log("result: ");
+    console.log(result);
+    */
 
     return result;
   }
@@ -226,6 +258,14 @@ class Crawler extends EventEmitter {
     const htmlWithoutComments = html.replace(/<!--(?:(?!-->)[\s\S])*-->/g, '');
     const reg = new RegExp(`<${tagName}\\s*[^>]*>`, 'gi');
     const foundTags = htmlWithoutComments.match(reg) || [];
+
+    /*
+    console.log('tagName: ');
+    console.log(tagName);
+    console.log("foundTags: ");
+    console.log(foundTags);
+    */
+
     const hrefs = [];
 
     foundTags
@@ -248,6 +288,11 @@ class Crawler extends EventEmitter {
         hrefs.push(strAttrs.slice(0, strAttrs.search(endChar)));
       });
 
+    /*
+    console.log("hrefs: ");
+    console.log(hrefs);
+    */
+
     return hrefs;
   }
 
@@ -255,7 +300,8 @@ class Crawler extends EventEmitter {
     this.countOfProcessedUrls += 1;
 
     if (eventsType === 'data') {
-      this.emit('data', { url: data.currentUrl, result: data.result });
+      if (data.currentUrl.endsWith('.jpg') || data.currentUrl.endsWith('.jpeg') || data.currentUrl.endsWith('.png')) 
+          this.emit('data', { url: data.currentUrl, result: data.result });
     } else if (eventsType === 'error') {
       this.emit('error', new Error(`Error in ${data.currentUrl}: ${data.error}`));
     }
