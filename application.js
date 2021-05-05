@@ -104,7 +104,6 @@ function hasType(predictions) {
 }
 
 const predictImage = async (pathWithFileName) => {
-  //console.log("path: ", pathWithFileName);
   await image(pathWithFileName, async (err, imageData) => {
 
       if (imageData) {
@@ -123,11 +122,12 @@ const predictImage = async (pathWithFileName) => {
           const input = tf.tensor3d(values, outShape, 'int32');
 
           const predictions = await model.classify(input);
-          //console.log('The picture could contain: ', predictions);
 
           /* Remove image file from disk if it is not of wanted type. */
           if (!hasType(predictions)) 
             deleteImage(pathWithFileName);
+          else
+            console.log("Hoorah! The image at", pathWithFileName, "is what you're looking for.");
 
       }
       else {
@@ -145,22 +145,23 @@ const crawler = new Crawler(domain);
 loadModel().then( value => crawler.crawl());
  
 crawler.on('data', (data) => {
-    //console.log(data.result.statusCode, data.url);
-    
-    options = {
-        url: data.url,
-        dest: process.cwd() + '/download',
-    };
+    if (data.url.endsWith('.jpg') || data.url.endsWith('.jpeg') || data.url.endsWith('.png')) {
+        options = {
+            url: data.url,
+            dest: process.cwd() + '/download',
+        };
+        download.image(options)
+            .then(({ filename }) => {
 
-    download.image(options)
-        .then(({ filename }) => {
+                /* Saved to options.dest directory. */
+                console.log('Saved to', filename, 'for content evaluation.');  
+                predictImage(filename);
 
-            /* Saved to options.dest directory. */
-            console.log('Saved to', filename, 'for content evaluation.');  
-            predictImage(filename);
-
-        }) 
-        .catch((err) => console.error(err));
+            }) 
+            .catch((err) => console.error(err));
+    }
+    else
+        console.log("Patience please. We're at", data.url, "digging right now.");      
 });
 crawler.on('error', (error) => console.error(error));
 crawler.on('end', () => console.log(`Finish! All urls on domain ${domain} were crawled!`));

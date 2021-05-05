@@ -43,23 +43,11 @@ class Crawler extends EventEmitter {
 
         this.getDataByUrl(currentUrl)
           .then((headers) => {
-            
-            /*
-            this.getDataByUrl(currentUrl, 'GET')
-              .then((result) => {
-                console.log(result);
-              }).catch((error) => {
-                this.generateEvents('error', { currentUrl, error });
-              });
-             */
 
             if (headers.statusCode === 200 && /^text\/html/.test(headers.headers['content-type'])) {
               this.getDataByUrl(currentUrl, 'GET')
                 .then((result) => {
-                
-                  //console.log(result);
                   result.links.forEach((link) => { if (link.url) this.crawl(link.url); });
-
                   this.generateEvents('data', { currentUrl, result });
                 }).catch((error) => {
                   this.generateEvents('error', { currentUrl, error });
@@ -126,8 +114,16 @@ class Crawler extends EventEmitter {
 
     if (/^https?:/.test(urlObject.protocol)) {
       if (urlObject.hostname) {
-        if (urlObject.hostname.replace(/^w{3}\./, '') === this.config.domain.replace(/^w{3}\./, '')) {
-          result = true;
+            
+          /* Accept image URL hosted somewhere else. */
+          if (urlObject.pathname.endsWith('.jpg') || urlObject.pathname.endsWith('.jpeg') 
+              || urlObject.pathname.endsWith('.png')) 
+            result = true;
+            
+          /* Non-image URL must be from same domain. */
+          if (urlObject.hostname.replace(/^w{3}\./, '') === this.config.domain.replace(/^w{3}\./, '')) {
+            result = true;
+
         }
       }
     }
@@ -200,12 +196,6 @@ class Crawler extends EventEmitter {
         response.on('data', (chunk) => { body += chunk; });
         response.on('end', () => {
           this.countOfConnections -= 1;
-
-        /*
-        if (/^text\/html/.test(response.headers['content-type']))
-          console.log("urls will be searched");
-        */
-
           resolve({
             requestMethod: method,
             statusCode: response.statusCode,
@@ -227,17 +217,10 @@ class Crawler extends EventEmitter {
 
   getUrlsOnHtml(currentUrl, html) {
 
-    /* Calling Crawler.getTagsHref() with 'base' always returns null. */
     const base = Crawler.getTagsHref('base', html)[0];
     const result = [];
 
-    Crawler.getTagsHref('a', html).forEach((href) => {
-      
-      /*
-      console.log('href looks like: ');
-      console.log(href);
-      */
-
+    Crawler.getTagsBruteLinks(html).forEach((href) => {
       if (result.find((value) => value.href === href) === undefined) {
         result.push({
           href,
@@ -245,27 +228,14 @@ class Crawler extends EventEmitter {
         });
       }
     });
-    
-    /*
-    console.log("result: ");
-    console.log(result);
-    */
 
     return result;
   }
 
-  static getTagsHref(tagName, html) {
+static getTagsHref(tagName, html) {
     const htmlWithoutComments = html.replace(/<!--(?:(?!-->)[\s\S])*-->/g, '');
     const reg = new RegExp(`<${tagName}\\s*[^>]*>`, 'gi');
     const foundTags = htmlWithoutComments.match(reg) || [];
-
-    /*
-    console.log('tagName: ');
-    console.log(tagName);
-    console.log("foundTags: ");
-    console.log(foundTags);
-    */
-
     const hrefs = [];
 
     foundTags
@@ -288,10 +258,59 @@ class Crawler extends EventEmitter {
         hrefs.push(strAttrs.slice(0, strAttrs.search(endChar)));
       });
 
-    /*
-    console.log("hrefs: ");
-    console.log(hrefs);
-    */
+    return hrefs;
+  }
+
+  static getTagsBruteLinks(html) {
+    const htmlWithoutComments = html.replace(/<!--(?:(?!-->)[\s\S])*-->/g, '');
+    const reg = new RegExp(`<((a)|(img))\\s*[^>]*>`, 'gi');
+    const foundTags = htmlWithoutComments.match(reg) || [];
+
+    const hrefs = [];
+
+    foundTags
+      .map((val) => val.replace(new RegExp(`(^<((a)|(img))\\s*|\\s*\\/?>$)`, 'gi'), '').trim())
+      .filter((val) => val.search(/(\s|^)((href)|(src))=/) > -1)
+      .forEach((val) => {
+        let strAttrs = val;
+        let commas = false;
+        let endChar = /(\s|$)/;
+
+        let startPos = strAttrs.search(/^(href)=/);
+
+        /* If it's a href="" from the start of string. */
+        if (startPos != -1)
+            strAttrs = strAttrs.slice(startPos + 5);
+        else {
+            startPos = strAttrs.search(/\s(href)=/);
+
+            /* If it's a href="" from the middle with space before. */
+            if (startPos != -1)
+                strAttrs = strAttrs.slice(startPos + 6);
+            else {
+                startPos = strAttrs.search(/^(src)=/);
+
+                /* If it's a src="" from the start of string. */
+                if (startPos != -1)
+                    strAttrs = strAttrs.slice(startPos + 4);
+                else {
+                    startPos = strAttrs.search(/\s(src)=/);
+
+                    /* If it's a src="" from the middle with space before. */
+                    if (startPos != -1)
+                        strAttrs = strAttrs.slice(startPos + 5);
+                }
+            }
+        }
+
+        if (/('|")/.test(strAttrs[0])) {
+          [commas] = strAttrs;
+          endChar = commas;
+          strAttrs = strAttrs.slice(1);
+        }
+
+        hrefs.push(strAttrs.slice(0, strAttrs.search(endChar)));
+      });
 
     return hrefs;
   }
@@ -300,8 +319,7 @@ class Crawler extends EventEmitter {
     this.countOfProcessedUrls += 1;
 
     if (eventsType === 'data') {
-      if (data.currentUrl.endsWith('.jpg') || data.currentUrl.endsWith('.jpeg') || data.currentUrl.endsWith('.png')) 
-          this.emit('data', { url: data.currentUrl, result: data.result });
+      this.emit('data', { url: data.currentUrl, result: data.result });
     } else if (eventsType === 'error') {
       this.emit('error', new Error(`Error in ${data.currentUrl}: ${data.error}`));
     }
