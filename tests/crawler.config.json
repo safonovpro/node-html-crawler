@@ -19,6 +19,26 @@
     "viber://chat?number=+79213126942": false,
     "#garget": false
   },
+  "isInterestingUrlWithFilter" : {
+    "http://example.com" : false,
+    "https://www.example.com/some/path" : true,
+    "https://username:password@example.com/some/path" : false,
+    "//www.example.com/some/path" : true,
+    "//username:password@example.com/some/path" : false,
+    "/some/path": false,
+    "some/path": false,
+    "http://safonov.pro" : false,
+    "https://www.safonov.pro/some/path" : false,
+    "https://username:password@www.safonov.pro/some/path" : false,
+    "//www.safonov.pro/some/path" : false,
+    "//username:password@www.safonov.pro/some/path" : false,
+    "mailto:example@example.com": false,
+    "mailto:alexey@safonov.pro": false,
+    "javascript:void(0)": false,
+    "tg://resolve?domain=safonovpro": false,
+    "viber://chat?number=+79213126942": false,
+    "#garget": false
+  },
   "getInterestingFullUrl" : [
     {"in": {"urlString": "http://example.com/some/path?a=1&b=2#hash"}, "out": "http://example.com/some/path?a=1&b=2"},
     {"in": {"urlString": "http://username:password@example.com/some/path?a=1&b=2#hash"}, "out": "http://example.com/some/path?a=1&b=2"},

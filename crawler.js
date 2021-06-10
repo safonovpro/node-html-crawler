@@ -15,6 +15,7 @@ class Crawler extends EventEmitter {
       limitForRedirects: 5,
       timeout: 300,
       headers: { 'User-Agent': 'Mozilla/5.0' },
+      urlFilter: () => true,
     };
 
     if (typeof config === 'string') {
@@ -131,6 +132,10 @@ class Crawler extends EventEmitter {
       result = true;
     }
 
+    if (result && !this.config.urlFilter(urlString)) {
+      result = false;
+    }
+
     return result;
   }
 
@@ -220,7 +225,7 @@ class Crawler extends EventEmitter {
     const base = Crawler.getTagsHref('base', html)[0];
     const result = [];
 
-    Crawler.getTagsBruteLinks(html).forEach((href) => {
+    Crawler.getTagsBruteLinks(html).forEach((href) =>
       if (result.find((value) => value.href === href) === undefined) {
         result.push({
           href,
