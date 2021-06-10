@@ -1,0 +1,161 @@
+<!doctype html>
+<html>
+  <head>
+    <title>candd client v.1</title>
+    <link rel="shortcut icon" href="favicon.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+
+div.spinner {
+  height: 21px;
+  width: 21px;
+  margin: 20px auto;
+  border-radius: 50%;
+  border: dashed 1px #D0CE03;
+  animation-name: loader-spin;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+@-webkit-keyframes loader-spin {
+  from   {  transform: rotate(0deg); }
+  to     {  transform: rotate(360deg); }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial;
+}
+
+/* The grid: Four equal columns that floats next to each other */
+.column {
+  float: left;
+  width: 15%;
+  padding: 10px;
+}
+
+/* Style the images inside the grid */
+.column img {
+  opacity: 0.9; 
+  cursor: pointer; 
+}
+
+.column img:hover {
+  opacity: 1;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* The expanding image container */
+.container {
+  position: relative;
+  display: none;
+}
+
+/* Expanding image text */
+#imgtext {
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+  color: white;
+  font-size: 20px;
+}
+
+/* Closable button inside the expanded image */
+.closebtn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  color: white;
+  font-size: 35px;
+  cursor: pointer;
+}
+</style>
+</head> 
+
+
+  <body>
+
+<div style="text-align:center">
+  <div class="spinner"></div>
+  <h3>System is searching...</h3>
+  <form method="get" action="/">
+    <button type="submit" class="btn btn-primary">Back</button>
+  </form>
+</div>
+
+<!-- The four columns -->
+<div class="row">
+</div>
+
+<div class="container">
+  <span onclick="this.parentElement.style.display='none'" class="closebtn">&times;</span>
+  <img id="expandedImg" style="width:100%">
+  <div id="imgtext"></div>
+</div>
+
+    <ul id="messages"></ul>
+<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+
+<script src="https://cdn.socket.io/4.1.1/socket.io.min.js" integrity="sha384-cdrFIqe3RasCMNE0jeFG9xJHog/tgOVC1E9Lzve8LQN1g5WUHo0Kvk1mawWjxX7a" crossorigin="anonymous"></script>
+    <script>
+      $(function () {
+        const socket = io("ws://localhost:3000");
+
+        socket.on('log_message', function(msg){
+          $('#messages').append($('<li>').text(msg));
+        });
+
+        /* If image is what user wants add it on page ready to be zoomed. */
+        socket.on('ok_image', function(msg){
+
+          $('div.row').append("<div class='column'><img src='" + msg + "' alt='" + msg + "' style='width:100%' " +
+            "onclick='myFunction(this);'></div>");
+
+          $('#messages').append($('<li>').text("Hoorah! The image " + msg + " is what you're looking for."));
+
+          console.log('ok image ' + msg);
+        });
+
+        /* If image is not what user wants add it on page and make it less visible . */
+        socket.on('bad_image', function(msg){
+
+          $('div.row').append("<div class='column'><img src='bad_images/" + msg + "' alt='" + msg + 
+            "' style='width:100%; opacity: 0.2'></div>");
+
+          $('#messages').append($('<li>').text("The image " + msg + " doesn't have valid content."));
+
+          console.log('bad image ' + msg);
+        });
+
+        socket.on("disconnect", (reason) => {
+          if (reason === "io server disconnect") {
+            // the disconnection was initiated by the server, you need to reconnect manually
+            $('div.spinner').css('animation-duration', '0s');
+            $('h3').html('Hopefully we found some pretty images for you.');
+          }
+          // else the socket will automatically try to reconnect
+        }); 
+
+      });
+
+        function myFunction(imgs) {
+          var expandImg = document.getElementById("expandedImg");
+          var imgText = document.getElementById("imgtext");
+          expandImg.src = imgs.src;
+          imgText.innerHTML = imgs.alt;
+          expandImg.parentElement.style.display = "block";
+        }
+    </script>
+  </body>
+</html>
+

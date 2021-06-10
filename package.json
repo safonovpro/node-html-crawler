@@ -36,7 +36,9 @@
     "@tensorflow-models/mobilenet": "^2.1.0",
     "@tensorflow/tfjs": "^3.4.0",
     "@tensorflow/tfjs-node": "^3.4.0",
+    "express": "^4.17.1",
     "get-image-data": "^5.0.0",
-    "image-downloader": "^4.0.1"
+    "image-downloader": "^4.0.1",
+    "socket.io": "^4.1.2"
   }
 }
