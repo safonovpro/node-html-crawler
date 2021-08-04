@@ -3,7 +3,7 @@
 
 [![npm package](https://nodei.co/npm/node-html-crawler.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/node-html-crawler)
 
-[![build status](https://api.travis-ci.org/safonovpro/node-html-crawler.svg?branch=master)](https://travis-ci.org/safonovpro/node-html-crawler)
+![build status](https://github.com/safonovpro/node-html-crawler/actions/workflows/tests.yml/badge.svg)
 [![dependency status](https://david-dm.org/safonovpro/node-html-crawler/status.svg)](https://david-dm.org/safonovpro/node-html-crawler)
 
 # Crawler of html-pages for node.js
